@@ -1,0 +1,55 @@
+
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[MeX]{polski}
+\usepackage{graphicx}   %do rysunków
+\usepackage{wrapfig}    %do rysunków otoczonych tekstem
+\usepackage{color}      %do użycia podst. kolorów oraz zdefiniowanych kolorów 
+
+%do kolorowych referencji do rysunków, cytowań:
+\usepackage{multicol}
+\usepackage{colortbl}
+\usepackage[colorlinks=true,linkcolor=firebrick,citecolor=green]{hyperref}
+
+%do zdefiniowana własnych kolorów:
+\definecolor{darkred}{rgb}{0.5,0,0}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+\definecolor{firebrick}{rgb}{0.75,0.125,0.125}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+
+\textwidth=16cm
+\textheight=23cm
+\topmargin=-2cm
+\oddsidemargin=0cm
+%%%% https://www.sharelatex.com/learn/Page_size_and_margins
+
+
+\title{Sprawozdanie}
+\author{Artur Dziedziczak}
+\date{\today}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+W dokumencie pokazane są podstawowe cele badania zderzeń ciężkich relatywistycznych jonów. W szczególności opisany jest diagram fazowy oraz omówione są plany poszukiwania punktu krytycznego silnie oddziałującej materii.     
+\end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wzory}
+
+\begin{equation}
+    \frac{\partial T_b}{\partial t}=\frac{(T_w-T_b)*h*a}{m_b*c_b}
+\end{equation}
+
+\begin{equation}
+    \frac{\partial T_w}{\partial t}=\frac{(T_w-T_w)*h*a}{m_w*c_w}
+\end{equation}
+
+\end{document}
+
