@@ -2,16 +2,18 @@ function zad1()
     deltaT=[-1500, -1000, -300,-50, -1, 1, 20, 50,200,400,1000,2000];
     h=[178, 176, 168, 161,160,160,160.2, 161, 165, 168, 174, 179];
 
-    a=aproksymacja_najmniejszych_kwadratow(deltaT, h,5);
+    a=aproksymacja_wyklad(deltaT, h,6);
     % a=interpolacja_vandermond(deltaT, h);
     
-    di = -1000:0.1:2000;
+    di = -1500:0.1:2000;
     dl = [];
 
     for i=1:length(di)
-        dl(i) = obliczanie_wielomianu(deltaT, h, a, di(i));
+        % dl(i) = obliczanie_wielomianu(deltaT, h, a, di(i));
     end
-    plot(deltaT, h, 'o', di, dl);
+    interpolacja_fn_sklejanymi_3_stopnia(deltaT, h);
+   % hold;
+   % plot(deltaT, h, 'o');
 end
 
 function zad1_bez_interpolacji()
