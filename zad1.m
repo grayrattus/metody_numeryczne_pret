@@ -11,7 +11,7 @@ function zad1()
     for i=1:length(di)
         % dl(i) = obliczanie_wielomianu(deltaT, h, a, di(i));
     end
-    interpolacja_fn_sklejanymi_3_stopnia(deltaT, h);
+    interpolacja_fn_sklejanymi_3_stopnia(deltaT, hz);
    % hold;
    % plot(deltaT, h, 'o');
 end
