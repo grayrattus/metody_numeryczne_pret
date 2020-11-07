@@ -14,3 +14,4 @@ function a=aproksymacja_najmniejszych_kwadratow(xp, yp, stopien_wielomianu)
     a = (transpose(M)*M) \ (transpose(M)*b);
 end
 
+% https://www.youtube.com/watch?v=5usW7aqo-bU
