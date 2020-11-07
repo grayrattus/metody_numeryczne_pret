@@ -1,5 +1,5 @@
 
-function y = obliczanie_wielomianu(xp, yp, a, x)
+function y = obliczanie_wielomianu(xp, a, x)
     if (x < xp(1))
         y=xp(1);
         return;
