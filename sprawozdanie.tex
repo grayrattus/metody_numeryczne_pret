@@ -1,11 +1,12 @@
 
-\documentclass[12pt,a4paper]{article}
+\documentclass[varwidth,12pt,a4paper]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[MeX]{polski}
 \usepackage{graphicx}   %do rysunków
 \usepackage{wrapfig}    %do rysunków otoczonych tekstem
 \usepackage{color}      %do użycia podst. kolorów oraz zdefiniowanych kolorów 
+\usepackage{amsmath}
 
 %do kolorowych referencji do rysunków, cytowań:
 \usepackage{multicol}
@@ -35,9 +36,42 @@
 
 \maketitle
 
-\begin{abstract}
-W dokumencie pokazane są podstawowe cele badania zderzeń ciężkich relatywistycznych jonów. W szczególności opisany jest diagram fazowy oraz omówione są plany poszukiwania punktu krytycznego silnie oddziałującej materii.     
-\end{abstract}
+\section{Opis zjawiska}
+
+Treść zadania jest rozbudowana jednak na wstępie chciałbym powtórzyć opis zjawiska, które w dalszej części będzie podlegało symulacji.
+
+Zjawiskiem tym jest proces chłodzenia metalowego pręta w specjalnym oleju. Do najważniejszych elementów zjawiska należą zmiany temepratury
+pręta $T_p$ oraz oleju $T_w$.
+
+Olej jak i pręt posiadają pewną masę $m_w, m_b$, od której w dużej mierze zależy szybkość zmian temperatury. Jeżeli 
+duży kontener wypełnimy olejem i wrzucimy do niego pręt o małej masie zostanie on szybciej schłodzony.
+
+Na szybkość zachodzenia reakcji zmian temperatury ma również wpływ współczynnik $A$, który jest sumaryczną powierzchnią
+ścianek pręta.
+
+\section{Model matematyczny}
+
+Opisany w sekcji \textbf{Opis zjawiska} proces ma swój model matematyczny, który pozwala na określenie zmian temperatur.
+\newline
+
+Równania stanu
+
+\begin{align}
+    \frac{m_b c_b}{hA} \frac{dT_b}{dt} + T_b = T_w  \\
+    \frac{m_w c_w}{hA} \frac{dT_w}{dt} + T_w = T_b  \nonumber
+\end{align}
+
+należy przekształcić do formy umożliwiającej obliczenie pochodnych po czasie
+
+\begin{equation}
+     \begin{cases}
+    \frac{\partial T_b}{\partial t}=\frac{(T_w-T_b)*h*a}{m_b*c_b} \\
+    \frac{\partial T_w}{\partial t}=\frac{(T_b-T_w)*h*a}{m_w*c_w} 
+    \end{cases}
+\end{equation}
+
+układ tych równań // TUTAJ NAPISAĆ O EULERZE
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -50,6 +84,222 @@ W dokumencie pokazane są podstawowe cele badania zderzeń ciężkich relatywist
 \begin{equation}
     \frac{\partial T_w}{\partial t}=\frac{(T_w-T_w)*h*a}{m_w*c_w}
 \end{equation}
+
+Gdzie 
+
+https://www.youtube.com/watch?v=wMMjF7kXnWA
+
+żeby 
+
+https://youtu.be/gfSKOfHRooQ
+
+Interpolacja funkcjami sklejanymi 3 stopnia (Cubic spines interpolation)
+
+Interpolacja ta odbywa się poprzez stworzenie funkcji wielomianów trzeciego stopnia $ p_k(x) $
+dla różnych interwałów $ [[x^k, x^{k+1}] $.
+
+$$
+    f(x) = \left\{ \begin{array}{ll}
+    p_1 (x) & \textrm{$x_1 <= x < x_2$}\\
+    p_2 (x) & \textrm{$x_2 <= x < x_3$}\\
+    \vdots  & \vdots \\
+    p_{m-1} (x) & \textrm{$x_{m-1} <= x < x_m$}\\
+    \end{array} \right.
+$$
+
+Dla punktów $(x_1, y_1), (x_2, y_2), ..., (x_m, y_m)$ dla, których $x_1 < x_2 < ... < x_m $
+należy utworzyć krzywą sześcienną poprzez interpolacje wielomianu stopnia trzeciego $p_k$ 
+pomiędzy każdą z kolejnych par punktów $(x_k, y_k)$ oraz $x_{k}, y_{k+1}$ zgodnie z takimi ograniczeniami:
+
+1. Każdy z wielomianów przechodzi przez kolejne punkty
+\begin{equation}
+    p_k (x_k) = y_k oraz p_k (x_{k+1}) = y_{k + 1}
+\end{equation}
+
+2. Każda pierwsza pochodna dla punktów wewnętrznych jest sobie równa
+\begin{equation}
+     \frac{\partial d}{\partial dx} p_jk (x_{k+1}) = \frac{\partial d}{\partial dx} p_{k+1} (x_{k+1})
+\end{equation}
+
+3. Druga pochodna dla punktów wewnętrznych jest sobie równa
+\begin{equation}
+     \frac{\partial d^2}{\partial dx^2} p_jk (x_{k+1}) = \frac{\partial d^2}{\partial dx^2} p_{k+1} (x_{k+1})
+\end{equation}
+
+4. Druga pochodna wynosi zero na punktach końcowych
+\begin{equation}
+     \frac{\partial d^2}{\partial dx^2} p_1 (x_{1}) = 0 oraz \frac{\partial d^2}{\partial dx^2} p_{m-1} (x_{m}) = 0
+\end{equation}
+
+Wielomian, który rozpatrujemy ma postać
+\begin{equation}
+    p(x) = a_i \Delta x^3 + b_i \Delta x^2 + c_i \Delta x + d_i
+\end{equation}
+\begin{equation}
+    p'(x) = 3 a_i \Delta x^2 + 2b \Delta x + c
+\end{equation}
+\begin{equation}
+    p''(x) = 6 a_i \Delta x + 2b
+\end{equation}
+
+I te warunki pozwalają na ułożenie układu równań liniowych.
+
+Zanim zaprogramowałem ten układ postawnowiłem rozwiązać sprawdzić jak taki układ powinien wyglądać dla 4 punktów.
+
+Wybrane przeze mnie punkty to $(x_k, y_k)  = (1,1), (2,5), (3,4), (4, 9) $
+
+Najpierw określam ile powinno być wielomianów w układzie równań 
+\begin{equation}
+n=(2*(N-2)+2)/2 = (2*(4-2)+2)/2 = 3 
+\end{equation}
+Możemy więc wyróżnić trzy wielomiany:
+
+\begin{equation}
+    p_1(x) = \delta _1 x^3 + \gamma _1 x^2 + \beta _1 x + \alpha _1
+\end{equation}
+\begin{equation}
+    p_2(x) = \delta _2 x^3 + \gamma _2 x^2 + \beta _2 x + \alpha _2
+\end{equation}
+\begin{equation}
+    p_3(x) = \delta _3 x^3 + \gamma _3 x^2 + \beta _3 x + \alpha _3
+\end{equation}
+
+Wektor niewiadomych, które musimy obliczyć wygląda następująco:
+\begin{equation}
+    [\delta _1, \delta_2, \delta_3, \gamma _1, \gamma _2, \gamma_3, \beta _1, \beta _2, \beta _3, \alpha _1, \alpha _2, \alpha _3 ]
+\end{equation}
+
+
+Teraz rozpatruje warunki:
+
+1. Każdy z wielomianów przechodzi przez kolejne punkty
+\begin{equation}
+    p_1(1) = \delta _1 x_1^3 + \gamma _1 x_1^2 + \beta _1 x_1 + \alpha _1 = 1
+\end{equation}
+\begin{equation}
+    p_1(2) = \delta _1 x_2^3 + \gamma _1 x_2^2 + \beta _1 x_2 + \alpha _1 = 5
+\end{equation}
+\begin{equation}
+    p_1(2) = \delta _2 x_2^3 + \gamma _2 x_2^2 + \beta _2 x_2 + \alpha _2 = 5
+\end{equation}
+\begin{equation}
+    p_1(3) = \delta _2 x_3^3 + \gamma _2 x_3^2 + \beta _2 x_3 + \alpha _2 = 4
+\end{equation}
+\begin{equation}
+    p_1(3) = \delta _3 x_3^3 + \gamma _3 x_3^2 + \beta _3 x_3 + \alpha _3 = 4
+\end{equation}
+\begin{equation}
+    p_1(4) = \delta _3 x_4^3 + \gamma _3 x_4^2 + \beta _3 x_4 + \alpha _3 = 9
+\end{equation}
+
+2. Każda pierwsza pochodna dla punktów wewnętrznych jest sobie równa
+\begin{equation}
+    3 \delta _1 x_2 ^2 + 2 \gamma _1 x_2 + \alpha _1 = 3 \delta _2 x_2 ^2 + 2 \gamma _2 x_2 + \alpha _2
+\end{equation}
+\begin{equation}
+    3 \delta _2 x_3 ^2 + 2 \gamma _2 x_3 + \alpha _2 = 3 \delta _3 x_3 ^2 + 2 \gamma _3 x_3 + \alpha _3
+\end{equation}
+
+3. Druga pochodna dla punktów wewnętrznych jest sobie równa
+\begin{equation}
+    6\delta _1 x_2 + 2 \gamma _1 = 6 \delta _2 x_2 + 2 \gamma _2
+\end{equation}
+\begin{equation}
+    6\delta _2 x_2 + 2 \gamma _2 = 6 \delta _3 x_3 + 2 \gamma _3
+\end{equation}
+
+4. Druga pochodna wynosi zero na punktach krańcowych
+\begin{equation}
+    6\delta _1 x_1 + 2 \gamma _1 = 0
+\end{equation}
+\begin{equation}
+    6\delta _3 x_4 + 2 \gamma _3 = 0
+\end{equation}
+
+Przekształcam te równania w macierz tridiagonalną, która połączona jest z dodatkowymi warunkami pochodnych. 
+W ten sposób całe obliczenie można wykonać używając operatora rozwiązania równań liniowych w Matlab.
+
+
+$$
+\left( \begin{array}{cccccccccccc}
+     1  &  1  &  1  &  1 &   0&    0&    0 &   0&    0&    0&    0&    0 \\
+     8  &  4  &  2  &  1 &   0&    0&    0 &   0&    0&    0&    0&    0 \\
+     0  &  0  &  0  &  0 &   8&    4&    2 &   1&    0&    0&    0&    0 \\
+     0  &  0  &  0  &  0 &  27&    9&    3 &   1&    0&    0&    0&    0 \\
+     0  &  0  &  0  &  0 &   0&    0&    0 &   0&   27&    9&    3&    1 \\
+     0  &  0  &  0  &  0 &   0&    0&    0 &   0&   64&   16&    4&    1 \\
+    12  &  4  &  1  &  0 & -12&   -4&   -1 &   0&    0&    0&    0&    0 \\
+     0  &  0  &  0  &  0 &  27&    6&    1 &   0&  -27&   -6&   -1&    0 \\
+    12  &  2  &  0  &  0 & -12&   -2&    0 &   0&    0&    0&    0&    0 \\
+     0  &  0  &  0  &  0 &  18&    2&    0 &   0&  -18&   -2&    0&    0 \\
+     6  &  2  &  0  &  0 &   0&    0&    0 &   0&    0&    0&    0&    0 \\
+     0  &  0  &  0  &  0 &   0&    0&    0 &   0&    0&   24&    8&    0 \\
+\end{array} \right) \left( \begin{array}{c}
+\delta _1\\
+\delta_2\\
+\delta_3\\
+\gamma _1\\
+\gamma _2\\
+\gamma_3\\
+\beta _1\\
+\beta _2\\
+\beta _3\\
+\alpha _1\\
+\alpha _2\\
+\alpha _3 \\
+\end{array} \right) = \left( \begin{array}{c}
+1 \\
+5 \\
+5 \\
+4 \\
+4 \\
+9 \\
+0 \\
+0 \\
+0 \\
+0 \\
+0 \\
+0 \\
+\end{array} \right) 
+$$
+
+Z czego współczynniki po rozwiązaniu ukłądu równań wynoszą
+$$
+\left( \begin{array}{c}
+\delta _1\\
+\delta_2\\
+\delta_3\\
+\gamma _1\\
+\gamma _2\\
+\gamma_3\\
+\beta _1\\
+\beta _2\\
+\beta _3\\
+\alpha _1\\
+\alpha _2\\
+\alpha _3 \\
+\end{array} \right) = \left( \begin{array}{c}
+-1.1724 \\
+3.5172 \\
+1.6552 \\
+-3.0000 \\
+0.8621 \\
+-8.6897 \\
+26.0690 \\
+-19.2759 \\
+8.7241 \\
+-79.4483 \\
+238.3448 \\
+-231.5517 \\
+\end{array} \right) 
+$$
+
+
+Dla punktów 
+
+https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
+
+
 
 \end{document}
 
