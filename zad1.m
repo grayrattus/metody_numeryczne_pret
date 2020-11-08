@@ -1,16 +1,61 @@
 function zad1()
     % wykresy_dla_tabeli();
     % wykresy_dla_tabeli_z_ruchomym_h();
-    obliczanie_calki_simpsonem();
+    % obliczanie_calki_simpsonem();
     % wykresy_modelu_aproksymujacego();
     % wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu();
+    newton_raphson();
+end
+
+function newton_raphson()
+    y=[ 1200
+        25 ];
+    krok=0.001;
+    zadany_czas=7;
+    t=0:krok:zadany_czas;
+
+    Tb=y(1);
+    Tw=y(2);
+    cb=3.85; % pojemnośc cieplna metalu pręta
+    A=0.0109; % powierzchnia pręta
+    cw=4.1813; % pojemność cieplna 
+    h=78; % współczynnik przewodnictwa cieplnego
+    mb=0.25; % masa pręta
+    
+    temperatury=[1200];
+    masy_wody=[0];
+    mw=0;
+    wymagana_temperatura=125;
+    for j = 1:1:inf
+        mw = mw + 0.1;
+        temperatura=0;
+        for i = 1:length(t)-1
+            obliczone=y(:,i) + krok * f(t(i), y(1,i), y(2,i), cb, A, mw, cw, h, mb);
+            temperatura=obliczone(1);
+            y(:,i+1)=obliczone;
+        end
+        temperatury = [temperatury temperatura];
+        masy_wody = [masy_wody mw];
+        if (temperatura <= wymagana_temperatura) 
+            break
+        end
+    end
+        
+    fig=figure('Renderer', 'painters', 'Position', [10 10 1920 1080])
+    plot(masy_wody, temperatury, 'o');
+    title(sprintf('Wykres temperatur dla zmiany w masie wody. Wymagany czas schłodzenia: %d s \n do temperatury: %d z ostateczną masą wody: %0.3f ',zadany_czas, wymagana_temperatura, masy_wody(length(masy_wody))));
+    xlabel('Czas [s]');
+    ylabel('Temperatura [stopnie celsiusza]');
+    legend('Temperatura pręta');
+    saveas(fig,sprintf('NewtonRaphson.png'));
+
+    hold off;
+    close;
 end
 
 function wartosc_calki = obliczanie_calki_simpsonem
     deltaT=[-1500, -1000, -300,-50, -1, 1, 20, 50,200,400,1000,2000];
     hMatrix=[178, 176, 168, 161,160,160,160.2, 161, 165, 168, 174, 179];
-
-    % a=aproksymacja_wyklad(deltaT, h,6);
 
     a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,5);
     ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
@@ -19,8 +64,7 @@ function wartosc_calki = obliczanie_calki_simpsonem
         y = abs( obliczanie_wielomianu(deltaT, a, X) - interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, X));
     end
 
-    wartosc_calki = calkowanie_numeryczne_parabol(-1500, 2000, 100, @oblicz_abs_roznice);
-    wartosc_calki 
+    wartosc_calki = calkowanie_numeryczne_parabol(-1500, 2000, 100, @oblicz_abs_roznice); 
 end
 
 function wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu()
