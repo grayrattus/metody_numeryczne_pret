@@ -1,14 +1,58 @@
 function zad1()
     % wykresy_dla_tabeli();
-    wykresy_dla_tabeli_z_ruchomym_h();
-    wykresy_modelu_aproksymujacego();
+    % wykresy_dla_tabeli_z_ruchomym_h();
+    obliczanie_calki_simpsonem();
+    % wykresy_modelu_aproksymujacego();
+    % wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu();
+end
+
+function wartosc_calki = obliczanie_calki_simpsonem
+    deltaT=[-1500, -1000, -300,-50, -1, 1, 20, 50,200,400,1000,2000];
+    hMatrix=[178, 176, 168, 161,160,160,160.2, 161, 165, 168, 174, 179];
+
+    % a=aproksymacja_wyklad(deltaT, h,6);
+
+    a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,5);
+    ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
+
+    function y = oblicz_abs_roznice(X)
+        y = abs( obliczanie_wielomianu(deltaT, a, X) - interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, X));
+    end
+
+    wartosc_calki = calkowanie_numeryczne_parabol(-1500, 2000, 100, @oblicz_abs_roznice);
+    wartosc_calki 
+end
+
+function wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu()
+    bledy=[];
+    for j=1:1:7
+        deltaT=[-1500, -1000, -300,-50, -1, 1, 20, 50,200,400,1000,2000];
+        hMatrix=[178, 176, 168, 161,160,160,160.2, 161, 165, 168, 174, 179];
+        di = -1500:0.1:2000;
+        dl = [];
+
+        a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,j);
+        for i=1:length(di)
+            dl(i) = obliczanie_wielomianu(deltaT, a, di(i));
+        end
+
+        hold on;
+        plot(deltaT, hMatrix, 'o', di, dl);
+
+        sum = 0;
+        for k=1:length(deltaT) 
+            sum = sum + (hMatrix(k) - obliczanie_wielomianu(deltaT, a, deltaT(k)))^2
+        end
+        bledy = [bledy, sqrt(sum)/(length(deltaT)+1)];
+    end
+    bledy
 end
 
 function wykresy_modelu_aproksymujacego()
     deltaT=[-1500, -1000, -300,-50, -1, 1, 20, 50,200,400,1000,2000];
     hMatrix=[178, 176, 168, 161,160,160,160.2, 161, 165, 168, 174, 179];
 
-    a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,5);
+    a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,3);
 
     Tb0 = [1200, 800, 1100, 1200, 800, 1100, 1100, 1100, 1100, 1100];
     Tw0 = [25, 25, 70, 25, 25, 70, 70, 70, 70, 70];
@@ -53,7 +97,7 @@ function wykresy_modelu_aproksymujacego()
         xlabel('Czas [s]');
         ylabel('Temperatura [stopnie celsiusza]');
         legend('Ruchome h: Temperatura pręta', 'Ruchome h: Temperatura wody', 'Stałe h: Temperatura pręta','Stałe h: Temperatura wody');
-        saveas(fig,sprintf('Pomiar_ruchome_h_%d.png',nr_pomiaru));
+        saveas(fig,sprintf('Najmniejsze_kwadraty%d.png',nr_pomiaru));
 
         hold off;
         close;
@@ -67,7 +111,6 @@ function wykresy_dla_tabeli_z_ruchomym_h()
 
     % a=aproksymacja_wyklad(deltaT, h,6);
 
-    di = -1000:0.1:2000;
     di = -1500:0.1:2000;
     dl = [];
 
@@ -86,7 +129,11 @@ function wykresy_dla_tabeli_z_ruchomym_h()
     fig=figure('Renderer', 'painters', 'Position', [10 10 1920 1080])
     hold on;
     plot(deltaT, hMatrix, 'o', di, dl);
-    interpolacja_fn_sklejanymi_3_stopnia(deltaT, hMatrix);
+    ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
+    for i=1:length(di)
+        dl(i) = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, di(i));
+    end
+    plot(di, dl, 'b');
 
     title(sprintf('Wykres dla współczynnika przewodnictwa cieplnego'));
     xlabel('DeltaT[stopnie Cel]');

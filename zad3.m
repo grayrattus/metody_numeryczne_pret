@@ -36,8 +36,8 @@ function dy = f(t, y, mw)
     cb=3.85; % pojemnośc cieplna metalu pręta
     A=0.0109; % powierzchnia pręta
     cw=4.1813; % pojemność cieplna 
-    h=160; % współczynnik przewodnictwa cieplnego
-    mb=0.2; % masa pręta
+    h=78; % współczynnik przewodnictwa cieplnego
+    mb=0.25; % masa pręta
 
     dy=[
         ((Tw-Tb)*h*A)/(mb*cb)
