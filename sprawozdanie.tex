@@ -2,6 +2,8 @@
 \documentclass[varwidth,12pt,a4paper]{article}
 
 \usepackage[utf8]{inputenc}
+\usepackage{csvsimple}
+\usepackage{booktabs}
 \usepackage[MeX]{polski}
 \usepackage{graphicx}   %do rysunków
 \usepackage{wrapfig}    %do rysunków otoczonych tekstem
@@ -70,28 +72,46 @@ należy przekształcić do formy umożliwiającej obliczenie pochodnych po czasi
     \end{cases}
 \end{equation}
 
-układ tych równań // TUTAJ NAPISAĆ O EULERZE
+układ tych równań różniczkowych przy pomocy metody Eulera i Ulepszonej metody Eulera pozwala na obliczenie $T_b, T_w$ dla pewnego kroku.
 
+\subsection{Metoda Eulera}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Wzory}
+Zakładając, że mamy jakąś funkcję $\frac{dy}{dt}' = f(t,y)$
+zgodnie z definicją pochodnej możemy zapisać
+\begin{equation}
+   \frac{dy}{dt} \approx \frac{\Delta y}{\Delta t} = \frac{y_{i+1} - y_i}{t_{i+1} - t_i} = f(t_i, y_i)
+\end{equation}
+możemy przekształcić przez przemnożenie przez $\Delta t$
 
 \begin{equation}
-    \frac{\partial T_b}{\partial t}=\frac{(T_w-T_b)*h*a}{m_b*c_b}
+    \Delta y = \Delta t * f(t_i, y_i)
 \end{equation}
+
+Ponieważ szukamy wzoru na $y_{n+1}$ zatem do wzoru
 
 \begin{equation}
-    \frac{\partial T_w}{\partial t}=\frac{(T_w-T_w)*h*a}{m_w*c_w}
+    y_{n+1} = y_n + \Delta y
 \end{equation}
 
-Gdzie 
+Podstawiamy
 
-https://www.youtube.com/watch?v=wMMjF7kXnWA
+\begin{equation}
+    y_{i+1} = y_i + \Delta t * f(t_i, y_i)
+\end{equation}
 
-żeby 
+Co pozwala nam na przybliżanie wartości pochodnej numerycznie.
 
-https://youtu.be/gfSKOfHRooQ
+\subsection{Ulepszona metoda Eulera}
+
+Różni się od podstowej tym, że iteracje odbywają się wzdłóż prostej o współczynniku
+kierunkowym równym współczynnikowi stycznej do krzywej w punkcie oddalonym od 
+$x_0$ o $\frac{h}{2}$.
+
+\begin{equation}
+    y_n = y_{n-1} + hf(x_{n-1} + \frac{h}{2}, y_{n-1} + \frac{h}{2} f(x_{n-1}, y_{n-1})
+\end{equation}
+
+\subsection{Funkcje sklejane 3 stopnia}
 
 Interpolacja funkcjami sklejanymi 3 stopnia (Cubic spines interpolation)
 
@@ -293,6 +313,89 @@ $$
 -231.5517 \\
 \end{array} \right) 
 $$
+
+\section{Zadanie 1}
+
+Cele zadania pierwszego:
+
+\begin{itemize}
+  \item Zaprezentowanie przebiegów czasowych dla różnych wartości z tabeli
+  \item Określenie błędów w odniesieniu do pomiarów z tabeli i przedyskutowanie wyników
+  \item Pokazanie różnicy w dokładności metody Eulera i Ulepszonej Metody Eulera
+\end{itemize}
+
+\subsection{Wykresy dla wartości z tabeli}
+
+Wykresy zostały wygenerowane dla danych:
+
+Krok: $0.1$
+
+Pojemność cieplna pręta: $cb=3.85[\frac{J}{kg * K}]$ 
+
+Powierzchnia pręta: $A=0.0109[m^2]$
+
+Pojemność cieplna oleju: $cw=4.1813[\frac{J}{kg * K}]$
+
+Współczynnik przewodnictwa: $h=160[kg]$
+
+Masa pręta: $mb=0.2[kg]$
+
+\begin{tabular}{cc}
+    \includegraphics[width=200]{Pomiar_1_krok_100.png} &
+    \includegraphics[width=200]{Pomiar_2_krok_100.png} \\
+    \includegraphics[width=200]{Pomiar_3_krok_100.png} &
+    \includegraphics[width=200]{Pomiar_4_krok_100.png} \\
+    \includegraphics[width=200]{Pomiar_5_krok_100.png} &
+    \includegraphics[width=200]{Pomiar_6_krok_100.png} \\
+    \includegraphics[width=200]{Pomiar_7_krok_100.png} &
+    \includegraphics[width=200]{Pomiar_8_krok_100.png} 
+\end{tabular}
+
+\begin{tabular}{cc}
+    \includegraphics[width=200]{Pomiar_9_krok_100.png} &
+    \includegraphics[width=200]{Pomiar_10_krok_100.png} 
+\end{tabular}
+
+\subsection{Błędy w odniesieniu do danych eksperymentu}
+\csvautobooktabular{zad1_dane_krok_100.csv}
+
+$Tb0$ - wartość początkowa temperatury pręta,
+$Tw0$ - wartość początkowa oleju,
+$czasy$ - czas zanurzenia w pręta w oleju,
+$Mw$ - wartość masy wody,
+$Tbk$ - końcowa wartość temperatury pręta z eksperymentu,
+$Twk$ - końcowa wartość temperatury oleju z eksperymentu,
+$eETb$ - błąd metody Eulera dla ostatniej wartości temperatury pręta
+$eETw$ - błąd metody Eulera dla ostatniej wartości temperatury oleju
+$eUETb$ - błąd Ulepszonej metody Eulera dla ostatniej wartości temperatury pręta
+$eUETw$ - błąd Ulepszonej metody Eulera dla ostatniej wartości temperatury oleju
+
+\subsection{Porównanie metod Eulera}
+
+\begin{tabular}{c}
+    \includegraphics[width=\textwidth]{Pomiar_1_krok_1.png} \\
+    \includegraphics[width=\textwidth]{Pomiar_2_krok_100.png} 
+\end{tabular}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wzory}
+
+\begin{equation}
+    \frac{\partial T_b}{\partial t}=\frac{(T_w-T_b)*h*a}{m_b*c_b}
+\end{equation}
+
+\begin{equation}
+    \frac{\partial T_w}{\partial t}=\frac{(T_w-T_w)*h*a}{m_w*c_w}
+\end{equation}
+
+Gdzie 
+
+https://www.youtube.com/watch?v=wMMjF7kXnWA
+
+żeby 
+
+https://youtu.be/gfSKOfHRooQ
+
 
 
 Dla punktów 

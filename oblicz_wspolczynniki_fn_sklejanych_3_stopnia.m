@@ -66,3 +66,16 @@ function ABCs=oblicz_wspolczynniki_fn_sklejanych_3_stopnia(X, Y)
     %%%Solve for coefficients
     ABCs = H\B;
 end
+
+function yspline = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, X, value)
+    for idx = 1:Num_eqns
+        if value >= X(idx) && value <= X(idx+1)
+            row = 1 + (idx-1)*4;
+            a = ABCs(row);
+            b = ABCs(row+1);
+            c = ABCs(row+2);
+            d = ABCs(row+3);
+            yspline = a*value.^3 + b*value.^2 + c*value + d;
+        end
+    end
+end

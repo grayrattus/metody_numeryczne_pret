@@ -1,10 +1,29 @@
 function zad1()
-    % wykresy_dla_tabeli();
+    wykresy_dla_tabeli(0.1);
+    wykresy_dla_tabeli(0.001);
     % wykresy_dla_tabeli_z_ruchomym_h();
     % obliczanie_calki_simpsonem();
     % wykresy_modelu_aproksymujacego();
     % wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu();
-    newton_raphson();
+    % newton_raphson();
+end
+
+function zadanie_4()
+    ilosc_pretow_do_schlodzenia = 1000000;
+    czas_do_schlodzenia = 24 * 60 * 60;
+
+    czas_wymiany_zbiornikow = 30;
+    
+    czas_chlodzenia_zbiornika_ze_125_do_25_stopni = masa_wody * 0.15 * 60 * 60;
+
+    koszt_wyprodukowania_zbiornika = 100 * masa_wody; % PLN
+    koszt_oleju_do_wypelnienia_zbiornika = 20 * masa_wody; %PLN
+    ilosc_pretow_do_zubozenia_oleju = 2000;
+
+    % for sekunda: 1:1:czas_do_schlodzenia
+    %     
+    % end
+
 end
 
 function newton_raphson()
@@ -170,7 +189,7 @@ function wykresy_dla_tabeli_z_ruchomym_h()
         dl(i) = obliczanie_wielomianu(deltaT, a, di(i));
     end
 
-    fig=figure('Renderer', 'painters', 'Position', [10 10 1920 1080])
+    fig=figure('Renderer', 'painters', 'Position', [10 10 800 600])
     hold on;
     plot(deltaT, hMatrix, 'o', di, dl);
     ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
@@ -189,7 +208,7 @@ function wykresy_dla_tabeli_z_ruchomym_h()
     close;
 end
 
-function wykresy_dla_tabeli()
+function wykresy_dla_tabeli(krok)
     Tb0 = [1200, 800, 1100, 1200, 800, 1100, 1100, 1100, 1100, 1100];
     Tw0 = [25, 25, 70, 25, 25, 70, 70, 70, 70, 70];
     Mw = [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 5, 10, 2.5, 2.5];
@@ -197,8 +216,12 @@ function wykresy_dla_tabeli()
     Tbk = [107.7, 79.1, 142.1, 105.7, 78.2, 150.1, 116.6, 99.1, 141.2, 140.9];
     Twk = [105.1, 78.0, 139.1, 105.5, 78.1, 138.2, 105.1, 88.1, 139.8, 140.1];
 
+    bledy_euler_Tb = [];
+    bledy_euler_Tw = [];
+
+    bledy_ulepszony_euler_Tw = [];
+    bledy_ulepszony_euler_Tb = [];
     for nr_pomiaru = 1:length(Tb0)
-        krok=0.1;
         t = 0:krok:czasy(nr_pomiaru);
         y=[
             Tb0(nr_pomiaru)
@@ -217,10 +240,10 @@ function wykresy_dla_tabeli()
 
         ostatni_wynik = y(:,length(y));
         
-        blad_Tb = blad_wzgledny(Tbk(nr_pomiaru), ostatni_wynik(1));
-        blad_Tw = blad_wzgledny(Twk(nr_pomiaru), ostatni_wynik(2));
+        bledy_euler_Tb = [bledy_euler_Tb, blad_wzgledny(Tbk(nr_pomiaru), ostatni_wynik(1))];
+        bledy_euler_Tw = [bledy_euler_Tw, blad_wzgledny(Twk(nr_pomiaru), ostatni_wynik(2))];
 
-        fig=figure('Renderer', 'painters', 'Position', [10 10 1920 1080])
+        fig=figure('Renderer', 'painters', 'Position', [10 10 800 600])
         hold on;
         plot(t, y(1,:), t, y(2,:));
 
@@ -230,19 +253,29 @@ function wykresy_dla_tabeli()
 
         ostatni_wynik = y(:,length(y));
         
-        blad_Tb = blad_wzgledny(Tbk(nr_pomiaru), ostatni_wynik(1));
-        blad_Tw = blad_wzgledny(Twk(nr_pomiaru), ostatni_wynik(2));
+        bledy_ulepszony_euler_Tb = [bledy_ulepszony_euler_Tb, blad_wzgledny(Tbk(nr_pomiaru), ostatni_wynik(1))];
+        bledy_ulepszony_euler_Tw = [bledy_ulepszony_euler_Tw , blad_wzgledny(Twk(nr_pomiaru), ostatni_wynik(2))];
 
         plot(t, y(1,:), t, y(2,:));
-        title(sprintf('Wykres dla Tb0(%d),Tw0(%d),czasu(%0.0f),Mw(%d),krok(%0.3f),blądTb(%0.3f),blądTk(%0.3f)',Tb0(nr_pomiaru), Tw0(nr_pomiaru),czasy(nr_pomiaru), Mw(nr_pomiaru), krok, blad_Tb, blad_Tw));
+        title(sprintf('Wykres dla Tb0(%d),Tw0(%d),czasu(%0.0f),Mw(%d),krok(%0.3f)',Tb0(nr_pomiaru), Tw0(nr_pomiaru),czasy(nr_pomiaru), Mw(nr_pomiaru), krok));
         xlabel('Czas [s]');
         ylabel('Temperatura [stopnie celsiusza]');
         legend('Euler: Temperatura pręta','Euler: Temperatura wody', 'Ulepszony Euler: Temperatura pręta', 'Ulepszony Euler: Temperatura wody');
-        saveas(fig,sprintf('Pomiar_%d.png',nr_pomiaru));
+        saveas(fig,sprintf('Pomiar_%d_krok_%d.png',nr_pomiaru, krok * 1000));
 
         hold off;
         close;
     end
+
+    headery = {'Tb0', 'Tw0', 'Mw', 'czasy', 'Tbk', 'Twk', 'eETb', 'eETw', 'eEUTw', 'eEUTb'};
+
+    macierz_do_zapisania = [
+         Tb0' Tw0' Mw' czasy' Tbk' Twk' bledy_euler_Tb' bledy_euler_Tw' bledy_ulepszony_euler_Tw' bledy_ulepszony_euler_Tb'
+    ]
+    macierz_do_zapisania = round(macierz_do_zapisania, 3);
+
+    writecell(headery, sprintf('zad1_dane_krok_%d.csv', krok*1000));
+    writematrix(macierz_do_zapisania, sprintf('zad1_dane_krok_%d.csv', krok*1000), 'WriteMode', 'append');
 end
 
 function r = euler(t, Tb, Tw, cb, A, mw, cw, h, mb, krok)
