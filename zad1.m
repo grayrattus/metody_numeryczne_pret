@@ -31,34 +31,35 @@ function zad1()
     end
 
     function newton_raphson()
-        y=[ 1200
-            25 ];
-        krok=0.001;
-        zadany_czas=7;
+        krok=0.01;
+        zadany_czas=0.7;
         t=0:krok:zadany_czas;
 
-        Tb=y(1);
-        Tw=y(2);
-        cb=3.85; % pojemnośc cieplna metalu pręta
+        cb=0.29; % pojemnośc cieplna metalu pręta
         A=0.0109; % powierzchnia pręta
         cw=4.1813; % pojemność cieplna 
-        h=78; % współczynnik przewodnictwa cieplnego
         mb=0.25; % masa pręta
         
         temperatury=[1200];
         masy_wody=[0];
         mw=0;
         wymagana_temperatura=125;
+        ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
         for j = 1:1:inf
-            mw = mw + 0.1;
+            y=[ 1200
+                25 ];
+            mw = mw + 0.01;
             temperatura=0;
             for i = 1:length(t)-1
-                obliczone=y(:,i) + krok * f(t(i), y(1,i), y(2,i), cb, A, mw, cw, h, mb);
+                h_sklejanych_3_stopnia = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, y(1,i) - y(2,i));
+                obliczone=ulepszony_euler(t(i), y(1,i), y(2,i), cb, A, mw, cw, h_sklejanych_3_stopnia, mb, krok);
                 temperatura=obliczone(1);
                 y(:,i+1)=obliczone;
             end
             temperatury = [temperatury temperatura];
             masy_wody = [masy_wody mw];
+
+            temperatura
             if (temperatura <= wymagana_temperatura) 
                 break
             end
@@ -67,7 +68,7 @@ function zad1()
         fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu)
         plot(masy_wody, temperatury, 'o');
         title(sprintf('Wykres temperatur dla zmiany w masie wody. Wymagany czas schłodzenia: %d s \n do temperatury: %d z ostateczną masą wody: %0.3f ',zadany_czas, wymagana_temperatura, masy_wody(length(masy_wody))));
-        xlabel('Czas [s]');
+        xlabel('Masa wody [kg]');
         ylabel('Temperatura [stopnie celsiusza]');
         legend('Temperatura pręta');
         saveas(fig,sprintf('NewtonRaphson.png'));
@@ -341,7 +342,7 @@ function zad1()
         y = [
             Tb,
             Tw
-        ]
+        ];
         r = y(:,1) + krok * f(t, Tb, Tw, cb, A, mw, cw, h, mb);
     end
 
@@ -349,7 +350,7 @@ function zad1()
         y = [
             Tb,
             Tw
-        ]
+        ];
         yp = y(:, 1) + krok/2 * f(t, Tb, Tw, cb, A, mw, cw, h, mb);
         r = y(:, 1) + krok * f(t, yp(1), yp(2), cb, A, mw, cw, h, mb); 
     end
