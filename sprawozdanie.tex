@@ -111,6 +111,31 @@ $x_0$ o $\frac{h}{2}$.
     y_n = y_{n-1} + hf(x_{n-1} + \frac{h}{2}, y_{n-1} + \frac{h}{2} f(x_{n-1}, y_{n-1})
 \end{equation}
 
+\subsection{Funkcje sklejane 1 stopnia}
+
+Interpolacja ta polega na stworzeniu wielomianów stopnia pierwszego pomiędzy $ [[x^k, x^{k+1}] $ przedziałami.
+
+Postać ogólna wielomianu interpolacyjnego wygląda następująco:
+
+\begin{equation}
+    y = \alpha + \beta * x
+\end{equation}
+
+A współczynniki $\alpha$ oraz $\beta$ uzyskuje się przez rozwiazanie układu równań:
+
+$$
+\left( \begin{array}{cc}
+    1 & x_k \\
+    1 & x_{k + 1} \\
+\end{array} \right) \left( \begin{array}{c}
+\alpha\\
+\beta \\
+\end{array} \right) = \left( \begin{array}{c}
+    y_k \\
+    y_{k + 1} \\
+\end{array} \right) 
+$$
+
 \subsection{Funkcje sklejane 3 stopnia}
 
 Interpolacja funkcjami sklejanymi 3 stopnia (Cubic spines interpolation)
@@ -381,6 +406,9 @@ $eUETw$ - błąd Ulepszonej metody Eulera dla ostatniej wartości temperatury ol
 
 Tutaj dopisać posumowanie --
 
+Małe błędy < 1stopień.
+Euler rozszerzony lepiej przybliza nawet przy mniejszym kroku
+
 \section{Część 2}
 
 Cele zadania drugiego:
@@ -393,7 +421,56 @@ Cele zadania drugiego:
   \item Sprawdzić wpływ modelu aproksymującego charakterystykę na wyniki symulacji
 \end{itemize}
 
+\subsection{Aproksymacja metodą najmniejszych kwadratów}
+
+\includegraphics[width=\textwidth]{Stopnie_wielomianu_5.png} 
+
+Do dalszych eksperymentów będę używał wielomianu stopnia 5 ponieważ 
+mimo iż błąd dla poszczególnych punktów z charakterystyki jest mniejszy to 
+z wykresów wielomianów stopnia większego niż 5 wynika iż zupełnie nie przybliżają
+one charakterystyki współczynnika $h$.
+
+\csvautobooktabular{bledy_stopni_wielomianow_8.csv}
+
+\includegraphics[width=\textwidth]{Stopnie_wielomianu_8.png} 
+
+\subsection{Interpolacja funkcjami sklejanymi}
+
+\includegraphics[width=\textwidth]{Charakterystyka_ruchomego_h.png} 
+
+Z wykresu wynika, że funkcje sklejane zdecydowanie lepiej radzą sobie w przybliżeniu charakterystyki
+współczynnika $h$. O ile \textbf{funkcje sklejane 1 stopnia} przybliżają charakterystykę poprzez funkcje
+liniowe, które tworzą proste pomiędzy punktami to \textbf{funkcje sklejane 3 stopnia} tworzą idealnie
+wygładzony wykres w punktach łączenia.
+
+\subsection{Całka metodą Simpsona}
+
+\includegraphics[width=\textwidth]{Metoda_simpsona.png} 
+
+\subsection{Wpłym modelu aproksymującego charakterystykę na wyniki}
+
+\begin{tabular}{cc}
+    \includegraphics[width=200]{modele_aproksymujace_1.png} &
+    \includegraphics[width=200]{modele_aproksymujace_2.png} \\
+    \includegraphics[width=200]{modele_aproksymujace_3.png} &
+    \includegraphics[width=200]{modele_aproksymujace_4.png} \\
+    \includegraphics[width=200]{modele_aproksymujace_5.png} &
+    \includegraphics[width=200]{modele_aproksymujace_6.png} \\
+    \includegraphics[width=200]{modele_aproksymujace_7.png} &
+    \includegraphics[width=200]{modele_aproksymujace_8.png} 
+\end{tabular}
+
 \section{Część 3}
+
+Cele zadania trzeciego:
+
+\begin{itemize}
+  \item Określić jak dużo oleju potrzeba do schłodzenia pręta w określonym czasie
+  \item Stworzenie wykresu dla metody Netwona-Raphsona
+\end{itemize}
+
+\includegraphics[width=\textwidth]{NewtonRaphson.png} 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Wzory}

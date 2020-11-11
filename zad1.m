@@ -5,11 +5,12 @@ function zad1()
 
     % wykresy_dla_tabeli(0.1);
     % wykresy_dla_tabeli(0.001);
-    wykresy_dla_tabeli_z_ruchomym_h();
-    wykresy_modelu_aproksymujacego();
-    wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu();
+    % wykresy_dla_tabeli_z_ruchomym_h();
+    % wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu(5);
+    % wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu(8);
     % obliczanie_calki_simpsonem();
-    % newton_raphson();
+    % wykresy_modelu_aproksymujacego();
+    newton_raphson();
 
     function zadanie_4()
         ilosc_pretow_do_schlodzenia = 1000000;
@@ -78,17 +79,42 @@ function zad1()
     function wartosc_calki = obliczanie_calki_simpsonem
         a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,5);
         ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
+        di = -1500:0.1:2000;
+        wartosci_kwadratow = []
+        wartosci_sklejanych = []
 
         function y = oblicz_abs_roznice(X)
             y = abs( obliczanie_wielomianu(deltaT, a, X) - interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, X));
         end
 
-        wartosc_calki = calkowanie_numeryczne_parabol(-1500, 2000, 100, @oblicz_abs_roznice); 
+        wartosc_calki = calkowanie_numeryczne_parabol(-1500, 2000, 100, @oblicz_abs_roznice) / 3500; 
+
+        fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu)
+        hold on;
+        for i=1:length(di)
+            wartosci_kwadratow(i) = obliczanie_wielomianu(deltaT, a, di(i));
+            wartosci_sklejanych(i) = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, di(i));
+        end
+        plot(di, wartosci_kwadratow, 'b', di, wartosci_sklejanych, 'r');
+
+        title(sprintf('Całka metodą simpsona pomiędzy funkcjami sklejanmi 3 stopnia a metodą kwadratów. \n Wartość całki: %.3f', wartosc_calki));
+        shade(di,wartosci_kwadratow, di, wartosci_sklejanych, 'FillType', [1, 2; 2, 1]);
+        xlabel('DeltaT[stopnie Cel]');
+        ylabel('h[W*m^-2]');
+        legend('Metoda kwadratów', 'Funkcje sklejane 3 stopnia');
+        saveas(fig,sprintf('Metoda_simpsona.png'));
+
+        hold off;
+        close;
     end
 
-    function wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu()
+    function wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu(stopnie_wielomianu)
         bledy=[];
-        for j=1:1:7
+        fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu)
+        labele_wielomianu = {'Wartości z eksperymentu'};
+        headery_bledow = {};
+        plot(deltaT, hMatrix, 'o');
+        for j=1:1:stopnie_wielomianu
             di = -1500:0.1:2000;
             dl = [];
 
@@ -98,19 +124,38 @@ function zad1()
             end
 
             hold on;
-            plot(deltaT, hMatrix, 'o', di, dl);
+            plot(di, dl);
 
             sum = 0;
             for k=1:length(deltaT) 
                 sum = sum + (hMatrix(k) - obliczanie_wielomianu(deltaT, a, deltaT(k)))^2
             end
             bledy = [bledy, sqrt(sum)/(length(deltaT)+1)];
+            labele_wielomianu{end+1} = sprintf('Wielomian stopnia %d', j);
+            headery_bledow{end+1} = sprintf('p(%d)', j);
         end
+        legend(labele_wielomianu);
+        title(sprintf('Wykres aproksymacji najmniejszych kwadratów dla różnych stopni wielomianów'));
+        xlabel('DeltaT[stopnie Cel]');
+        ylabel('h[W*m^-2]');
+        saveas(fig,sprintf('Stopnie_wielomianu_%d.png',stopnie_wielomianu));
+        hold off;
+
+        macierz_do_zapisania = [
+            bledy
+        ]
+        macierz_do_zapisania = round(macierz_do_zapisania, 5);
+
+        writecell(headery_bledow, sprintf('bledy_stopni_wielomianow_%d.csv', stopnie_wielomianu));
+        writematrix(macierz_do_zapisania, sprintf('bledy_stopni_wielomianow_%d.csv',stopnie_wielomianu), 'WriteMode', 'append');
+
+        close;
         bledy
     end
 
     function wykresy_modelu_aproksymujacego()
-        a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,3);
+        a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,5);
+        ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
 
         Tb0 = [1200, 800, 1100, 1200, 800, 1100, 1100, 1100, 1100, 1100];
         Tw0 = [25, 25, 70, 25, 25, 70, 70, 70, 70, 70];
@@ -118,11 +163,24 @@ function zad1()
         czasy = [3, 3, 3, 5, 5, 2, 2, 2, 4, 5];
         Tbk = [107.7, 79.1, 142.1, 105.7, 78.2, 150.1, 116.6, 99.1, 141.2, 140.9];
         Twk = [105.1, 78.0, 139.1, 105.5, 78.1, 138.2, 105.1, 88.1, 139.8, 140.1];
+        h=160; % współczynnik przewodnictwa cieplnego
 
         for nr_pomiaru = 1:length(Tb0)
             krok=0.1;
             t = 0:krok:czasy(nr_pomiaru);
-            y=[
+            y_stale_h=[
+                Tb0(nr_pomiaru)
+                Tw0(nr_pomiaru)
+            ];
+            y_kwadraty=[
+                Tb0(nr_pomiaru)
+                Tw0(nr_pomiaru)
+            ];
+            y_funkcje_3_stopnia=[
+                Tb0(nr_pomiaru)
+                Tw0(nr_pomiaru)
+            ];
+            y_funkcje_1_stopnia=[
                 Tb0(nr_pomiaru)
                 Tw0(nr_pomiaru)
             ];
@@ -134,39 +192,42 @@ function zad1()
 
             fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu)
             hold on;
-            plot(t, y(1,:), t, y(2,:));
 
             for i = 1:length(t)-1
-                h_od_delta_T = y(1,i) - y(2,1);
-                ruchomy_h = obliczanie_wielomianu(deltaT, a, h_od_delta_T);
+                h_kwadratow = obliczanie_wielomianu(deltaT, a, y_kwadraty(1,i) - y_kwadraty(2,i));
+                h_sklejanych_3_stopnia = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, y_funkcje_3_stopnia(1,i) - y_funkcje_3_stopnia(2,i));
+                h_sklejanych_1_stopnia = interpolacja_funkcjami_sklejanymi(deltaT, hMatrix, y_funkcje_1_stopnia(1,i) - y_funkcje_1_stopnia(2,i));
 
-                y(:,i+1)=ulepszony_euler(t(i), y(1,i), y(2,i), cb, A, Mw(nr_pomiaru), cw, ruchomy_h, mb, krok);
+                y_kwadraty(:,i+1)=ulepszony_euler(t(i), y_kwadraty(1,i), y_kwadraty(2,i), cb, A, Mw(nr_pomiaru), cw, h_kwadratow, mb, krok);
+                y_funkcje_3_stopnia(:,i+1)=ulepszony_euler(t(i), y_funkcje_3_stopnia(1,i), y_funkcje_3_stopnia(2,i), cb, A, Mw(nr_pomiaru), cw, h_sklejanych_3_stopnia, mb, krok);
+                y_funkcje_1_stopnia(:,i+1)=ulepszony_euler(t(i), y_funkcje_1_stopnia(1,i), y_funkcje_1_stopnia(2,i), cb, A, Mw(nr_pomiaru), cw, h_sklejanych_1_stopnia, mb, krok);
+                y_stale_h(:,i+1)=ulepszony_euler(t(i), y_stale_h(1,i), y_stale_h(2,i), cb, A, Mw(nr_pomiaru), cw, h, mb, krok);
             end
 
-            plot(t, y(1,:), t, y(2,:));
+            plot(t, y_kwadraty(1,:), t, y_kwadraty(2,:), t, y_funkcje_3_stopnia(1,:), t, y_funkcje_3_stopnia(2,:), t, y_funkcje_1_stopnia(1,:), t, y_funkcje_1_stopnia(2,:), t, y_stale_h(1, :), t, y_stale_h(2,:));
 
-            h=160; % współczynnik przewodnictwa cieplnego
-            for i = 1:length(t)-1
-                y(:,i+1)=ulepszony_euler(t(i), y(1,i), y(2,i), cb, A, Mw(nr_pomiaru), cw, h, mb, krok);
-            end
-
-            plot(t, y(1,:), t, y(2,:));
-            title(sprintf('Metoda najmniejszych kwadratów \n Wykres dla Tb0(%d),Tw0(%d),czasu(%0.0f),Mw(%d),krok(%0.3f)',Tb0(nr_pomiaru), Tw0(nr_pomiaru),czasy(nr_pomiaru), Mw(nr_pomiaru), krok));
+            title(sprintf('Wykres dla Tb0(%d),Tw0(%d),czasu(%0.0f),Mw(%d),krok(%0.3f)',Tb0(nr_pomiaru), Tw0(nr_pomiaru),czasy(nr_pomiaru), Mw(nr_pomiaru), krok));
             xlabel('Czas [s]');
             ylabel('Temperatura [stopnie celsiusza]');
-            legend('Ruchome h: Temperatura pręta', 'Ruchome h: Temperatura wody', 'Stałe h: Temperatura pręta','Stałe h: Temperatura wody');
-            saveas(fig,sprintf('Najmniejsze_kwadraty%d.png',nr_pomiaru));
+            legenda={
+                'Temp Pręta Najmniejsze kwadraty'
+                'Temp Oleju Najmniejsze kwadraty'
+                'Temp Pręta Funkcje sklejane 3 stopnia'
+                'Temp Oleju Funkcje sklejane 3 stopnia'
+                'Temp Pręta Funkcje sklejane 1 stopnia'
+                'Temp Oleju Funkcje sklejane 1 stopnia'
+                'Temp Pręta stałe h'
+                'Temp Oleju stałe h'
+            }
+            legend(legenda);
+            saveas(fig,sprintf('modele_aproksymujace_%d.png',nr_pomiaru));
 
             hold off;
             close;
         end
-
     end
 
     function wykresy_dla_tabeli_z_ruchomym_h()
-
-        % a=aproksymacja_wyklad(deltaT, h,6);
-
         di = -1500:0.1:2000;
         dl = [];
 
@@ -191,10 +252,15 @@ function zad1()
         end
         plot(di, dl, 'b');
 
+        for i=1:length(di)
+            dl(i) = interpolacja_funkcjami_sklejanymi(deltaT, hMatrix, di(i));
+        end
+        plot(di, dl, 'g');
+
         title(sprintf('Wykres dla współczynnika przewodnictwa cieplnego'));
         xlabel('DeltaT[stopnie Cel]');
         ylabel('h[W*m^-2]');
-        legend('Charakterystyka pomiarowa', 'Aproksymacja najmniejszych kwadratów', 'Interpolacja funkcjami sklejanymi 3 stopnia');
+        legend('Charakterystyka pomiarowa', 'Aproksymacja najmniejszych kwadratów', 'Interpolacja funkcjami sklejanymi 3 stopnia', 'Interpolacja funkcjami 1 stopnia');
         saveas(fig,sprintf('Charakterystyka_ruchomego_h.png'));
 
         hold off;
