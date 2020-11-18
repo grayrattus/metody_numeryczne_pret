@@ -52,7 +52,7 @@ function zad1()
             temperatura=0;
             for i = 1:length(t)-1
                 h_sklejanych_3_stopnia = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, y(1,i) - y(2,i));
-                obliczone=ulepszony_euler(t(i), y(1,i), y(2,i), cb, A, mw, cw, h_sklejanych_3_stopnia, mb, krok);
+                obliczone=ulepszony_euler(y(1,i), y(2,i), cb, A, mw, cw, h_sklejanych_3_stopnia, mb, krok);
                 temperatura=obliczone(1);
                 y(:,i+1)=obliczone;
             end
@@ -199,10 +199,10 @@ function zad1()
                 h_sklejanych_3_stopnia = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, y_funkcje_3_stopnia(1,i) - y_funkcje_3_stopnia(2,i));
                 h_sklejanych_1_stopnia = interpolacja_funkcjami_sklejanymi(deltaT, hMatrix, y_funkcje_1_stopnia(1,i) - y_funkcje_1_stopnia(2,i));
 
-                y_kwadraty(:,i+1)=ulepszony_euler(t(i), y_kwadraty(1,i), y_kwadraty(2,i), cb, A, Mw(nr_pomiaru), cw, h_kwadratow, mb, krok);
-                y_funkcje_3_stopnia(:,i+1)=ulepszony_euler(t(i), y_funkcje_3_stopnia(1,i), y_funkcje_3_stopnia(2,i), cb, A, Mw(nr_pomiaru), cw, h_sklejanych_3_stopnia, mb, krok);
-                y_funkcje_1_stopnia(:,i+1)=ulepszony_euler(t(i), y_funkcje_1_stopnia(1,i), y_funkcje_1_stopnia(2,i), cb, A, Mw(nr_pomiaru), cw, h_sklejanych_1_stopnia, mb, krok);
-                y_stale_h(:,i+1)=ulepszony_euler(t(i), y_stale_h(1,i), y_stale_h(2,i), cb, A, Mw(nr_pomiaru), cw, h, mb, krok);
+                y_kwadraty(:,i+1)=ulepszony_euler(y_kwadraty(1,i), y_kwadraty(2,i), cb, A, Mw(nr_pomiaru), cw, h_kwadratow, mb, krok);
+                y_funkcje_3_stopnia(:,i+1)=ulepszony_euler(y_funkcje_3_stopnia(1,i), y_funkcje_3_stopnia(2,i), cb, A, Mw(nr_pomiaru), cw, h_sklejanych_3_stopnia, mb, krok);
+                y_funkcje_1_stopnia(:,i+1)=ulepszony_euler(y_funkcje_1_stopnia(1,i), y_funkcje_1_stopnia(2,i), cb, A, Mw(nr_pomiaru), cw, h_sklejanych_1_stopnia, mb, krok);
+                y_stale_h(:,i+1)=ulepszony_euler(y_stale_h(1,i), y_stale_h(2,i), cb, A, Mw(nr_pomiaru), cw, h, mb, krok);
             end
 
             plot(t, y_kwadraty(1,:), t, y_kwadraty(2,:), t, y_funkcje_3_stopnia(1,:), t, y_funkcje_3_stopnia(2,:), t, y_funkcje_1_stopnia(1,:), t, y_funkcje_1_stopnia(2,:), t, y_stale_h(1, :), t, y_stale_h(2,:));
@@ -295,7 +295,7 @@ function zad1()
             mb=0.2; % masa pręta
 
             for i = 1:length(t)-1
-                y(:,i+1)=euler(t(i), y(1,i), y(2,i), cb, A, Mw(nr_pomiaru), cw, h, mb, krok);
+                y(:,i+1)=euler(y(1,i), y(2,i), cb, A, Mw(nr_pomiaru), cw, h, mb, krok);
             end
 
             ostatni_wynik = y(:,length(y));
@@ -308,7 +308,7 @@ function zad1()
             plot(t, y(1,:), t, y(2,:));
 
             for i = 1:length(t)-1
-                y(:,i+1)=ulepszony_euler(t(i), y(1,i), y(2,i), cb, A, Mw(nr_pomiaru), cw, h, mb, krok);
+                y(:,i+1)=ulepszony_euler(y(1,i), y(2,i), cb, A, Mw(nr_pomiaru), cw, h, mb, krok);
             end
 
             ostatni_wynik = y(:,length(y));
@@ -338,28 +338,12 @@ function zad1()
         writematrix(macierz_do_zapisania, sprintf('zad1_dane_krok_%d.csv', krok*1000), 'WriteMode', 'append');
     end
 
-    function r = euler(t, Tb, Tw, cb, A, mw, cw, h, mb, krok)
+    function r = euler(Tb, Tw, cb, A, mw, cw, h, mb, krok)
         y = [
             Tb,
             Tw
         ];
-        r = y(:,1) + krok * f(t, Tb, Tw, cb, A, mw, cw, h, mb);
-    end
-
-    function r = ulepszony_euler(t, Tb, Tw, cb, A, mw, cw, h, mb, krok)
-        y = [
-            Tb,
-            Tw
-        ];
-        yp = y(:, 1) + krok/2 * f(t, Tb, Tw, cb, A, mw, cw, h, mb);
-        r = y(:, 1) + krok * f(t, yp(1), yp(2), cb, A, mw, cw, h, mb); 
-    end
-
-    function dy = f(t, Tb, Tw, cb, A, mw, cw, h, mb)
-        dy=[
-            ((Tw-Tb)*h*A)/(mb*cb)
-            ((Tb-Tw)*h*A)/(mw*cw)
-            ];    
+        r = y(:,1) + krok * f(Tb, Tw, cb, A, mw, cw, h, mb);
     end
 
 end
