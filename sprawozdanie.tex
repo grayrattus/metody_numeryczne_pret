@@ -15,6 +15,37 @@
 \usepackage{colortbl}
 \usepackage[colorlinks=true,linkcolor=firebrick,citecolor=green]{hyperref}
 
+% paczki do ogarnięcia kodu
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
 %do zdefiniowana własnych kolorów:
 \definecolor{darkred}{rgb}{0.5,0,0}
 \definecolor{darkblue}{rgb}{0,0,0.5}
@@ -74,6 +105,8 @@ należy przekształcić do formy umożliwiającej obliczenie pochodnych po czasi
 
 układ tych równań różniczkowych przy pomocy metody Eulera i Ulepszonej metody Eulera pozwala na obliczenie $T_b, T_w$ dla pewnego kroku.
 
+\lstinputlisting[language=Octave, caption=Funkcja równań stanu]{f.m}
+
 \subsection{Metoda Eulera}
 
 Zakładając, że mamy jakąś funkcję $\frac{dy}{dt}' = f(t,y)$
@@ -101,6 +134,8 @@ Podstawiamy
 
 Co pozwala nam na przybliżanie wartości pochodnej numerycznie.
 
+\lstinputlisting[language=Octave, caption=Funkcja Eulera]{eulerr.m}
+
 \subsection{Ulepszona metoda Eulera}
 
 Różni się od podstowej tym, że iteracje odbywają się wzdłóż prostej o współczynniku
@@ -110,6 +145,8 @@ $x_0$ o $\frac{h}{2}$.
 \begin{equation}
     y_n = y_{n-1} + hf(x_{n-1} + \frac{h}{2}, y_{n-1} + \frac{h}{2} f(x_{n-1}, y_{n-1})
 \end{equation}
+
+\lstinputlisting[language=Octave, caption=Funkcja ulepszonej metody Eulera]{ulepszony_euler.m}
 
 \subsection{Funkcje sklejane 1 stopnia}
 
@@ -135,6 +172,8 @@ $$
     y_{k + 1} \\
 \end{array} \right) 
 $$
+
+\lstinputlisting[language=Octave, caption=Funkcja interpolująca funkcjami sklejanymi 1 stopnia]{interpolacja_funkcjami_sklejanymi.m}
 
 \subsection{Funkcje sklejane 3 stopnia}
 
@@ -339,6 +378,28 @@ $$
 \end{array} \right) 
 $$
 
+\lstinputlisting[language=Octave, caption=Funkcja obliczająca współczynniki funkcji sklejanych 3 stopnia]{oblicz_wspolczynniki_fn_sklejanych_3_stopnia.m}
+
+\lstinputlisting[language=Octave, caption=Funkcja interpolująca wielomian dla współczynników funkcji sklejanych 3 stopnia]{interpoluj_wspolczynniki_fn_3_stopnia.m}
+
+\subsection{Metoda Simpsona}
+
+Metoda pozwala na numeryczne przybliżenie całki za pomocą zastąpienia przedziałów całkowania łukiem paraboli.
+\begin{equation}
+\int_{x_0}^{x_n} f(x)dx = \sum_{k}^{i=1} \int_{2_{i-2}}^{x_{2i}} f(x)dx \approx \frac{h}{3}(y_0 + 4 \sum_{i=1}^{k} y_{2i-1} + 2 \sum_{i=1}^{k-1} y_{2i} + y_n)
+\end{equation}
+
+\lstinputlisting[language=Octave, caption=Funkcja obliczająca wartość całki metodą parabol]{calkowanie_numeryczne_parabol.m}
+
+\subsection{Metoda Newtona-Raphsona}
+
+Metoda ta pozwala na numeryczne przybliżenie pierwiastka równania dowolnej ciągłej funkcji $f$.
+
+Wzór do obliczenia tego pierwiastka można wyrazić rekurencyjnie:
+\begin{equation}
+    x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)}
+\end{equation}
+
 \section{Część 1}
 
 Cele zadania pierwszego:
@@ -470,6 +531,8 @@ Cele zadania trzeciego:
 \end{itemize}
 
 \includegraphics[width=\textwidth]{NewtonRaphson.png} 
+
+\lstinputlisting[language=Octave, caption=Program generujący wykresy i tabele do zadań 1-3]{zad1.m}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
