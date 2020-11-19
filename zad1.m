@@ -276,7 +276,7 @@ function zad1()
             mb=0.2; % masa pręta
 
             for i = 1:length(t)-1
-                y(:,i+1)=euler(y(1,i), y(2,i), cb, A, Mw(nr_pomiaru), cw, h, mb, krok);
+                y(:,i+1)=eulerr(y(1,i), y(2,i), cb, A, Mw(nr_pomiaru), cw, h, mb, krok);
             end
 
             ostatni_wynik = y(:,length(y));
@@ -325,13 +325,4 @@ function zad1()
         writecell(headery, sprintf('zad1_dane_krok_%d.csv', krok*1000));
         writematrix(macierz_do_zapisania, sprintf('zad1_dane_krok_%d.csv', krok*1000), 'WriteMode', 'append');
     end
-
-    function r = euler(Tb, Tw, cb, A, mw, cw, h, mb, krok)
-        y = [
-            Tb,
-            Tw
-        ];
-        r = y(:,1) + krok * f(Tb, Tw, cb, A, mw, cw, h, mb);
-    end
-
 end
