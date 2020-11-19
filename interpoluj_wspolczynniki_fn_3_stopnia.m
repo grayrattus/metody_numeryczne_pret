@@ -1,16 +1,16 @@
-function yspline = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, X, value)
-    N = length(X);
-    Num_eqns = N-1;
-    for idx = 1:Num_eqns
-        if value >= X(idx) && value <= X(idx + 1)
-            row = 1 + (idx-1)*4;
-            a = ABCs(row);
-            b = ABCs(row+1);
-            c = ABCs(row+2);
-            d = ABCs(row+3);
-            yspline = a*value^3 + b*value^2 + c*value + d;
+function wartosc_spline = interpoluj_wspolczynniki_fn_3_stopnia(wspolczynniki, X, y)
+    ilosc_wartosci = length(X);
+    ilosc_rownan = ilosc_wartosci-1;
+    for i = 1:ilosc_rownan
+        if y >= X(i) && y <= X(i + 1)
+            wiersz = 1 + (i-1)*4;
+            a = wspolczynniki(wiersz);
+            b = wspolczynniki(wiersz+1);
+            c = wspolczynniki(wiersz+2);
+            d = wspolczynniki(wiersz+3);
+            wartosc_spline = a*y^3 + b*y^2 + c*y + d;
             return;
         end
     end
-    yspline = 0;
+    wartosc_spline = 0;
 end

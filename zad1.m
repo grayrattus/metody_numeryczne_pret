@@ -34,14 +34,14 @@ function zad1()
         masy_wody=[0];
         mw=0;
         wymagana_temperatura=125;
-        ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
+        wspolczynniki_fn_sklejanych = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
         for j = 1:1:inf
             y=[ 1200
                 25 ];
             mw = mw + 0.01;
             temperatura=0;
             for i = 1:length(t)-1
-                h_sklejanych_3_stopnia = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, y(1,i) - y(2,i));
+                h_sklejanych_3_stopnia = interpoluj_wspolczynniki_fn_3_stopnia(wspolczynniki_fn_sklejanych, deltaT, y(1,i) - y(2,i));
                 obliczone=ulepszony_euler(y(1,i), y(2,i), cb, A, mw, cw, h_sklejanych_3_stopnia, mb, krok);
                 temperatura=obliczone(1);
                 y(:,i+1)=obliczone;
@@ -49,13 +49,12 @@ function zad1()
             temperatury = [temperatury temperatura];
             masy_wody = [masy_wody mw];
 
-            temperatura
             if (temperatura <= wymagana_temperatura) 
                 break
             end
         end
             
-        fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu)
+        fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu);
         plot(masy_wody, temperatury, 'o');
         title(sprintf('Wykres temperatur dla zmiany w masie wody\nWymagany czas schlodzenia: %0.3f s \n do temperatury: %d $[^\\circ C]$ z ostateczna masa wody: %0.3f [kg] ',zadany_czas, wymagana_temperatura, masy_wody(length(masy_wody))), 'interpreter', 'latex');
         annotation('textbox',[.15 .1 .8 .8],'interpreter', 'latex', 'String',{
@@ -75,22 +74,22 @@ function zad1()
 
     function wartosc_calki = obliczanie_calki_simpsonem
         a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,5);
-        ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
+        wspolczynniki_fn_sklejanych = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
         di = -1500:0.1:2000;
-        wartosci_kwadratow = []
-        wartosci_sklejanych = []
+        wartosci_kwadratow = [];
+        wartosci_sklejanych = [];
 
         function y = oblicz_abs_roznice(X)
-            y = abs( obliczanie_wielomianu(deltaT, a, X) - interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, X));
+            y = abs( obliczanie_wielomianu(deltaT, a, X) - interpoluj_wspolczynniki_fn_3_stopnia(wspolczynniki_fn_sklejanych, deltaT, X));
         end
 
         wartosc_calki = calkowanie_numeryczne_parabol(-1500, 2000, 100, @oblicz_abs_roznice) / 3500; 
 
-        fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu)
+        fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu);
         hold on;
         for i=1:length(di)
             wartosci_kwadratow(i) = obliczanie_wielomianu(deltaT, a, di(i));
-            wartosci_sklejanych(i) = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, di(i));
+            wartosci_sklejanych(i) = interpoluj_wspolczynniki_fn_3_stopnia(wspolczynniki_fn_sklejanych, deltaT, di(i));
         end
         plot(di, wartosci_kwadratow, 'b', di, wartosci_sklejanych, 'r');
 
@@ -107,7 +106,7 @@ function zad1()
 
     function wykresy_dla_tabeli_z_ruchomym_h_dla_roznego_stopnia_wielomianu(stopnie_wielomianu)
         bledy=[];
-        fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu)
+        fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu);
         labele_wielomianu = {'Wartości z eksperymentu'};
         headery_bledow = {};
         plot(deltaT, hMatrix, 'o');
@@ -125,7 +124,7 @@ function zad1()
 
             sum = 0;
             for k=1:length(deltaT) 
-                sum = sum + (hMatrix(k) - obliczanie_wielomianu(deltaT, a, deltaT(k)))^2
+                sum = sum + (hMatrix(k) - obliczanie_wielomianu(deltaT, a, deltaT(k)))^2;
             end
             bledy = [bledy, sqrt(sum)/(length(deltaT)+1)];
             labele_wielomianu{end+1} = sprintf('Wielomian stopnia %d', j);
@@ -140,19 +139,18 @@ function zad1()
 
         macierz_do_zapisania = [
             bledy
-        ]
+        ];
         macierz_do_zapisania = round(macierz_do_zapisania, 5);
 
         writecell(headery_bledow, sprintf('bledy_stopni_wielomianow_%d.csv', stopnie_wielomianu));
         writematrix(macierz_do_zapisania, sprintf('bledy_stopni_wielomianow_%d.csv',stopnie_wielomianu), 'WriteMode', 'append');
 
         close;
-        bledy
     end
 
     function wykresy_modelu_aproksymujacego()
         a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,5);
-        ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
+        wspolczynniki_fn_sklejanych = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
 
         h=160; % współczynnik przewodnictwa cieplnego
 
@@ -181,12 +179,12 @@ function zad1()
             cw=4.1813; % pojemność cieplna 
             mb=0.2; % masa pręta
 
-            fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu)
+            fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu);
             hold on;
 
             for i = 1:length(t)-1
                 h_kwadratow = obliczanie_wielomianu(deltaT, a, y_kwadraty(1,i) - y_kwadraty(2,i));
-                h_sklejanych_3_stopnia = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, y_funkcje_3_stopnia(1,i) - y_funkcje_3_stopnia(2,i));
+                h_sklejanych_3_stopnia = interpoluj_wspolczynniki_fn_3_stopnia(wspolczynniki_fn_sklejanych, deltaT, y_funkcje_3_stopnia(1,i) - y_funkcje_3_stopnia(2,i));
                 h_sklejanych_1_stopnia = interpolacja_funkcjami_sklejanymi(deltaT, hMatrix, y_funkcje_1_stopnia(1,i) - y_funkcje_1_stopnia(2,i));
 
                 y_kwadraty(:,i+1)=ulepszony_euler(y_kwadraty(1,i), y_kwadraty(2,i), cb, A, Mw(nr_pomiaru), cw, h_kwadratow, mb, krok);
@@ -215,7 +213,7 @@ function zad1()
                 'Temp Oleju Funkcje sklejane 1 stopnia'
                 'Temp Pręta stałe h'
                 'Temp Oleju stałe h'
-            }
+            };
             legend(legenda);
             saveas(fig,sprintf('modele_aproksymujace_%d.png',nr_pomiaru));
 
@@ -237,9 +235,9 @@ function zad1()
         fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu);
         hold on;
         plot(deltaT, hMatrix, 'o', di, dl);
-        ABCs = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
+        wspolczynniki_fn_sklejanych = oblicz_wspolczynniki_fn_sklejanych_3_stopnia(deltaT, hMatrix);
         for i=1:length(di)
-            dl(i) = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, deltaT, di(i));
+            dl(i) = interpoluj_wspolczynniki_fn_3_stopnia(wspolczynniki_fn_sklejanych, deltaT, di(i));
         end
         plot(di, dl, 'b');
 
@@ -286,7 +284,7 @@ function zad1()
             bledy_euler_Tb = [bledy_euler_Tb, blad_wzgledny(Tbk(nr_pomiaru), ostatni_wynik(1))];
             bledy_euler_Tw = [bledy_euler_Tw, blad_wzgledny(Twk(nr_pomiaru), ostatni_wynik(2))];
 
-            fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu)
+            fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu);
             hold on;
             plot(t, y(1,:), t, y(2,:));
 
@@ -321,7 +319,7 @@ function zad1()
 
         macierz_do_zapisania = [
             Tb0' Tw0' Mw' czasy' Tbk' Twk' bledy_euler_Tb' bledy_euler_Tw' bledy_ulepszony_euler_Tw' bledy_ulepszony_euler_Tb'
-        ]
+        ];
         macierz_do_zapisania = round(macierz_do_zapisania, 3);
 
         writecell(headery, sprintf('zad1_dane_krok_%d.csv', krok*1000));

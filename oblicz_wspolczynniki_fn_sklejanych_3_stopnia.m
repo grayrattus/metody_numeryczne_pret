@@ -1,81 +1,57 @@
-% function y=interpolacja_fn_sklejanymi_3_stopnia(xp, yp)
-function ABCs=oblicz_wspolczynniki_fn_sklejanych_3_stopnia(X, Y)
-    N = length(Y);
+function wspolczynniki=oblicz_wspolczynniki_fn_sklejanych_3_stopnia(X, Y)
+    ilosc_wartosci = length(Y);
 
-    Num_eqns = N-1;
-    Unknowns = 4*Num_eqns;
+    ilosc_rownan = ilosc_wartosci-1;
+    ilosc_wspolczynnikow = 4*ilosc_rownan;
 
-    %%%Create the Y vector
-    B = zeros(2*(N-2)+2 + (N-2) + (N-2) + 2,1);
+    m_wartosci = zeros(2*(ilosc_wartosci-2)+2 + (ilosc_wartosci-2) + (ilosc_wartosci-2) + 2,1);
 
-    %%%Creating H0 - This ensures that the spline passed through all data points
-    Num_row = 2*(N-2) + 2;
-    H0 = zeros(Num_row,Unknowns);
-    for idx = 1:(Num_row/2)
-        col = ((idx-1)*4+1);
-        row = (idx-1)*2 + 1;
-        for jdx = col:(col+3)
-            H0(row,jdx) = X(idx)^(3-jdx+col);
-            H0(row+1,jdx) = X(idx+1)^(3-jdx+col);
+    ilosc_wierszy = 2*(ilosc_wartosci-2) + 2;
+    macierz_tridiagonalna = zeros(ilosc_wierszy,ilosc_wspolczynnikow);
+    for i = 1:(ilosc_wierszy/2)
+        kolumna = ((i-1)*4+1);
+        wiersz = (i-1)*2 + 1;
+        for j = kolumna:(kolumna+3)
+            macierz_tridiagonalna(wiersz,j) = X(i)^(3-j+kolumna);
+            macierz_tridiagonalna(wiersz+1,j) = X(i+1)^(3-j+kolumna);
         end
-        B(row,1) = Y(idx);
-        B(row+1,1) = Y(idx+1);
+        m_wartosci(wiersz,1) = Y(i);
+        m_wartosci(wiersz+1,1) = Y(i+1);
     end
 
-    %%%Creating H1 - this ensures that all first derivatives are the same
-    H1 = zeros(N-2,Unknowns);
-    for idx = 2:(N-1)
-        col = 1 + (idx-2)*4;
-        H1(idx-1,col) = 3*X(idx)^2;
-        H1(idx-1,col+1) = 2*X(idx);
-        H1(idx-1,col+2) = 1;
-        H1(idx-1,col+3) = 0;
-        H1(idx-1,col+4) = -3*X(idx)^2;
-        H1(idx-1,col+5) = -2*X(idx);
-        H1(idx-1,col+6) = -1;
-        H1(idx-1,col+7) = 0;
+    m_pochodnych = zeros(ilosc_wartosci-2,ilosc_wspolczynnikow);
+    for i = 2:(ilosc_wartosci-1)
+        kolumna = 1 + (i-2)*4;
+        m_pierwszych_pochodnych(i-1,kolumna) = 3*X(i)^2;
+        m_pierwszych_pochodnych(i-1,kolumna+1) = 2*X(i);
+        m_pierwszych_pochodnych(i-1,kolumna+2) = 1;
+        m_pierwszych_pochodnych(i-1,kolumna+3) = 0;
+        m_pierwszych_pochodnych(i-1,kolumna+4) = -3*X(i)^2;
+        m_pierwszych_pochodnych(i-1,kolumna+5) = -2*X(i);
+        m_pierwszych_pochodnych(i-1,kolumna+6) = -1;
+        m_pierwszych_pochodnych(i-1,kolumna+7) = 0;
     end
 
-    %%%Create H2 - This ensures that all second derivatives are the same
-    H2 = 0*H1;
-    for idx = 2:(N-1)
-        col = 1 + (idx-2)*4;
-        H2(idx-1,col) = 6*X(idx);
-        H2(idx-1,col+1) = 2;
-        H2(idx-1,col+2) = 0;
-        H2(idx-1,col+3) = 0;
-        H2(idx-1,col+4) = -6*X(idx);
-        H2(idx-1,col+5) = -2;
-        H2(idx-1,col+6) = 0;
-        H2(idx-1,col+7) = 0;
+    m_drugich_pochodnych = 0*m_pochodnych;
+    for i = 2:(ilosc_wartosci-1)
+        kolumna = 1 + (i-2)*4;
+        m_drugich_pochodnych(i-1,kolumna) = 6*X(i);
+        m_drugich_pochodnych(i-1,kolumna+1) = 2;
+        m_drugich_pochodnych(i-1,kolumna+2) = 0;
+        m_drugich_pochodnych(i-1,kolumna+3) = 0;
+        m_drugich_pochodnych(i-1,kolumna+4) = -6*X(i);
+        m_drugich_pochodnych(i-1,kolumna+5) = -2;
+        m_drugich_pochodnych(i-1,kolumna+6) = 0;
+        m_drugich_pochodnych(i-1,kolumna+7) = 0;
     end
 
-    %%%This ensures that the second derivative at the endpoints must be zero
-    Hepts = zeros(2,Unknowns);
-    %%%1st end point
-    Hepts(1,1) = 6*X(1);
-    Hepts(1,2) = 2*X(1);
-    Hepts(1,3) = 0;
-    Hepts(2,end) = 0;
-    Hepts(2,end-1) = 2*X(end);
-    Hepts(2,end-2) = 6*X(end);
+    m_druga_drugich_pochodnych = zeros(2,ilosc_wspolczynnikow);
+    m_druga_drugich_pochodnych(1,1) = 6*X(1);
+    m_druga_drugich_pochodnych(1,2) = 2*X(1);
+    m_druga_drugich_pochodnych(1,3) = 0;
+    m_druga_drugich_pochodnych(2,end) = 0;
+    m_druga_drugich_pochodnych(2,end-1) = 2*X(end);
+    m_druga_drugich_pochodnych(2,end-2) = 6*X(end);
 
-    %%%stack everything together
-    H = [H0;H1;H2;Hepts];
-
-    %%%Solve for coefficients
-    ABCs = H\B;
-end
-
-function yspline = interpoluj_wspolczynniki_fn_3_stopnia(ABCs, X, value)
-    for idx = 1:Num_eqns
-        if value >= X(idx) && value <= X(idx+1)
-            row = 1 + (idx-1)*4;
-            a = ABCs(row);
-            b = ABCs(row+1);
-            c = ABCs(row+2);
-            d = ABCs(row+3);
-            yspline = a*value.^3 + b*value.^2 + c*value + d;
-        end
-    end
+    wspolczynniki = [macierz_tridiagonalna;m_pierwszych_pochodnych;m_drugich_pochodnych;m_druga_drugich_pochodnych]\m_wartosci;
 end

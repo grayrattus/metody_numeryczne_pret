@@ -18,11 +18,11 @@ function y=interpolacja_funkcjami_sklejanymi(xp, yp, x)
     A = [
          1 xp(i)
          1 xp(i + 1)
-        ]
+        ];
     b = [
         yp(i)
         yp(i + 1)
-    ]
+    ];
 
     a = A\b;
 

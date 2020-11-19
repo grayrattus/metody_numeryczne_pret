@@ -1,6 +1,6 @@
 function y = calkowanie_numeryczne_parabol(a, b, n, f)
     h = (b - a) / n;
-    y = f(a) + f(b)
+    y = f(a) + f(b);
 
     for  i = 1:n-1
         if (mod(i,2))
