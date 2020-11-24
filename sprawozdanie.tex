@@ -9,6 +9,9 @@
 \usepackage{wrapfig}    %do rysunków otoczonych tekstem
 \usepackage{color}      %do użycia podst. kolorów oraz zdefiniowanych kolorów 
 \usepackage{amsmath}
+\usepackage{float}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
 
 %do kolorowych referencji do rysunków, cytowań:
 \usepackage{multicol}
@@ -52,12 +55,15 @@
 \definecolor{firebrick}{rgb}{0.75,0.125,0.125}
 \definecolor{darkgreen}{rgb}{0,0.5,0}
 
-\textwidth=16cm
-\textheight=23cm
-\topmargin=-2cm
-\oddsidemargin=0cm
-%%%% https://www.sharelatex.com/learn/Page_size_and_margins
-
+\usepackage[
+  top=2cm,
+  bottom=1cm,
+  left=3cm,
+  right=2cm,
+  headheight=17pt, % as per the warning by fancyhdr
+  includehead,includefoot,
+  heightrounded, % to avoid spurious underfull messages
+]{geometry} 
 
 \title{Sprawozdanie}
 \author{Artur Dziedziczak}
@@ -412,49 +418,45 @@ Cele zadania pierwszego:
 
 \subsection{Wykresy dla wartości z tabeli}
 
-Wykresy zostały wygenerowane dla danych:
-
-Krok: $0.1$
-
-Pojemność cieplna pręta: $cb=3.85[\frac{J}{kg * K}]$ 
-
-Powierzchnia pręta: $A=0.0109[m^2]$
-
-Pojemność cieplna oleju: $cw=4.1813[\frac{J}{kg * K}]$
-
-Współczynnik przewodnictwa: $h=160[kg]$
-
-Masa pręta: $mb=0.2[kg]$
-
-\begin{tabular}{cc}
-    \includegraphics[width=200]{Pomiar_1_krok_100.png} &
-    \includegraphics[width=200]{Pomiar_2_krok_100.png} \\
-    \includegraphics[width=200]{Pomiar_3_krok_100.png} &
-    \includegraphics[width=200]{Pomiar_4_krok_100.png} \\
-    \includegraphics[width=200]{Pomiar_5_krok_100.png} &
-    \includegraphics[width=200]{Pomiar_6_krok_100.png} \\
-    \includegraphics[width=200]{Pomiar_7_krok_100.png} &
-    \includegraphics[width=200]{Pomiar_8_krok_100.png} 
-\end{tabular}
-
-\begin{tabular}{cc}
-    \includegraphics[width=200]{Pomiar_9_krok_100.png} &
-    \includegraphics[width=200]{Pomiar_10_krok_100.png} 
-\end{tabular}
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{Pomiar_1_krok_100.png} \\
+    \includegraphics[width=\textwidth]{Pomiar_2_krok_100.png} \\
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{Pomiar_3_krok_100.png} \\
+    \includegraphics[width=\linewidth]{Pomiar_4_krok_100.png} \\
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{Pomiar_5_krok_100.png} \\
+    \includegraphics[width=\linewidth]{Pomiar_6_krok_100.png} \\
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{Pomiar_7_krok_100.png} \\
+    \includegraphics[width=\linewidth]{Pomiar_8_krok_100.png} \\
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{Pomiar_9_krok_100.png} \\
+    \includegraphics[width=\linewidth]{Pomiar_10_krok_100.png} 
+\end{figure}
 
 \subsection{Błędy w odniesieniu do danych eksperymentu}
-\csvautobooktabular{zad1_dane_krok_100.csv}
 
-$Tb0$ - wartość początkowa temperatury pręta,
-$Tw0$ - wartość początkowa oleju,
-$czasy$ - czas zanurzenia w pręta w oleju,
-$Mw$ - wartość masy wody,
-$Tbk$ - końcowa wartość temperatury pręta z eksperymentu,
-$Twk$ - końcowa wartość temperatury oleju z eksperymentu,
-$eETb$ - błąd metody Eulera dla ostatniej wartości temperatury pręta
-$eETw$ - błąd metody Eulera dla ostatniej wartości temperatury oleju
-$eUETb$ - błąd Ulepszonej metody Eulera dla ostatniej wartości temperatury pręta
-$eUETw$ - błąd Ulepszonej metody Eulera dla ostatniej wartości temperatury oleju
+\begin{table}[H]
+    \centering\csvautobooktabular{zad1_dane_krok_100.csv}
+\end{table}
+
+\begin{itemize}
+    \item $Tb0$ - wartość początkowa temperatury pręta,
+    \item $Tw0$ - wartość początkowa oleju,
+    \item $czasy$ - czas zanurzenia w pręta w oleju,
+    \item $Mw$ - wartość masy wody,
+    \item $Tbk$ - końcowa wartość temperatury pręta z eksperymentu,
+    \item $Twk$ - końcowa wartość temperatury oleju z eksperymentu,
+    \item $eETb$ - błąd metody Eulera dla ostatniej wartości temperatury pręta
+    \item $eETw$ - błąd metody Eulera dla ostatniej wartości temperatury oleju
+    \item $eUETb$ - błąd Ulepszonej metody Eulera dla ostatniej wartości temperatury pręta
+    \item $eUETw$ - błąd Ulepszonej metody Eulera dla ostatniej wartości temperatury oleju
+\end{itemize}
 
 \subsection{Porównanie metod Eulera}
 
@@ -491,7 +493,9 @@ mimo iż błąd dla poszczególnych punktów z charakterystyki jest mniejszy to
 z wykresów wielomianów stopnia większego niż 5 wynika iż zupełnie nie przybliżają
 one charakterystyki współczynnika $h$.
 
-\csvautobooktabular{bledy_stopni_wielomianow_8.csv}
+\begin{table}[H]
+    \centering\csvautobooktabular{bledy_stopni_wielomianow_8.csv}
+\end{table}
 
 \includegraphics[width=\textwidth]{Stopnie_wielomianu_8.png} 
 
@@ -521,6 +525,8 @@ wygładzony wykres w punktach łączenia.
     \includegraphics[width=200]{modele_aproksymujace_8.png} 
 \end{tabular}
 
+\subsection{Podsumowanie}
+
 \section{Część 3}
 
 Cele zadania trzeciego:
@@ -534,33 +540,30 @@ Cele zadania trzeciego:
 
 \lstinputlisting[language=Octave, caption=Program generujący wykresy i tabele do zadań 1-3]{zad1.m}
 
+\subsection{Podsumowanie}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Wzory}
+\section{Część 4}
 
-\begin{equation}
-    \frac{\partial T_b}{\partial t}=\frac{(T_w-T_b)*h*a}{m_b*c_b}
-\end{equation}
+Bisekcja.png
+PretyNaDobe.png
+IloscNapelnienZbiornikow.png
+IloscZbiornikow.png
+MasaOleju.png
 
-\begin{equation}
-    \frac{\partial T_w}{\partial t}=\frac{(T_w-T_w)*h*a}{m_w*c_w}
-\end{equation}
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{Bisekcja.png} \\
+    \includegraphics[width=\textwidth]{MasaOleju.png} \\
+\end{figure}
 
-Gdzie 
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{IloscZbiornikow.png} \\
+    \includegraphics[width=\textwidth]{PretyNaDobe.png} \\
+\end{figure}
 
-https://www.youtube.com/watch?v=wMMjF7kXnWA
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{IloscNapelnienZbiornikow.png} \\
+\end{figure}
 
-żeby 
-
-https://youtu.be/gfSKOfHRooQ
-
-
-
-Dla punktów 
-
-https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
-
-
+\subsection{Podsumowanie}
 
 \end{document}
-

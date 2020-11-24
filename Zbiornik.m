@@ -22,6 +22,10 @@ classdef Zbiornik < handle
                obj.zaktualizuj_temperature(obj.domyslna_temperatura_oleju);
             end
         end
+        function obj = wymien_olej(obj)
+            obj.czas_chlodzenia = 30;
+            obj.zaktualizuj_temperature(obj.domyslna_temperatura_oleju);
+        end
         function obj = zaktualizuj_stan(obj, temperatura_ropoczecia_chlodzenia, interwal)
             if temperatura_ropoczecia_chlodzenia <= obj.temperatura_oleju && obj.czas_chlodzenia <= 0
                obj.czas_chlodzenia = obj.masa_zbiornika * 15 * 60;
