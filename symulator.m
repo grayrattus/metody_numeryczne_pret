@@ -57,7 +57,7 @@ function symulator
 
         ilosc_pretow_na_dobe = ilosc_pretow_do_schlodzenia - pozostala_ilosc_pretow;
 
-        koszt = koszt + 100 * masa_bisekcji + 20 * ilosc_zbiornikow;
+        koszt = koszt + (100 * masa_bisekcji)*ilosc_zbiornikow + (20 * ilosc_zbiornikow * masa_bisekcji);
 
         dane_o_kosztach = [dane_o_kosztach, [
             koszt
@@ -72,9 +72,14 @@ function symulator
         dane_o_kosztach
         if (ilosc_pretow_na_dobe >= ilosc_pretow_do_schlodzenia) 
             if poprzedni_koszt - koszt <= 100 
-                headery = {'koszt', 'masa', 'ilosc_napelnien', 'ilosc_pretow_na_dobe'};
-                writecell(headery_bledow, 'symulator.csv');
-                writematrix(dane_o_kosztach,'symulator.csv', 'WriteMode', 'append');
+                headery = {'koszt', 'masa', 'iloscZbiornikow','iloscNapelnien', 'iloscPretowNaDobe'};
+                writecell(headery, 'symulator.csv');
+                writematrix(transpose(dane_o_kosztach),'symulator.csv', 'WriteMode', 'append');
+
+                headery_symulacji = {'krokCzasu', 'cb', 'A', 'cw', 'mb'};
+                writecell(headery_symulacji, 'wspolczynniki_symulacji.csv');
+                writematrix([krok_czasu, cb, A, cw, mb],'wspolczynniki_symulacji.csv', 'WriteMode', 'append');
+
 
                 fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu)
                 ilosc_danych = 0:length(dane_o_kosztach(1,:)) - 1;
