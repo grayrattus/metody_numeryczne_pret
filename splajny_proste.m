@@ -1,46 +1,13 @@
-function wspolczynniki = splajny_proste()
-    Y=[-1500, -1000, -300,-50, -1, 1, 20, 50,200,400,1000,2000];
-    X=[178, 176, 168, 161,160,160,160.2, 161, 165, 168, 174, 179];
-
-    kwadraty_wspolczynniki=aproksymacja_najmniejszych_kwadratow(Y,X,5);
-
-    n = 10; 
-    rownoodlegle_y = [];
-    a = -1500;
-    b = 2000;
-    % a = 0;
-    % b = 5;
-    h = (b - a) / n;
-
-    % xx = 0:0.001:5;
-    % yy = [];
-    % for i = 1:length(xx)
-    %     yy(i) = oblicz(xx(i));
-    % end
-    rownoodlegle_x = []
-    for i = 1:(n + 1)
-        rownoodlegle_x(i) = a + (i - 1) * h;
-        rownoodlegle_y(i) = obliczanie_wielomianu(Y, kwadraty_wspolczynniki, rownoodlegle_x(i));
-        % rownoodlegle_y(i) = oblicz(rownoodlegle_x(i));
-    end
-
-    hold on;
-    % plot(xx, yy, 'b');
-    plot(rownoodlegle_x, rownoodlegle_y, 'r');
-    plot(Y,X, 'o');
-
-    macierz = (zeros(length(rownoodlegle_x) - 2, length(rownoodlegle_x) ));
+function wartosc = splajny_proste(rownoodlegle_x, rownoodlegle_y, pochodna_a, pochodna_b, x_arg, n, h)
+    macierz = zeros(length(rownoodlegle_x) - 2, length(rownoodlegle_x));
     for i = 1:(length(rownoodlegle_x) - 2)
         macierz(i, i) = 1;
         macierz(i, i+1) = 4;
         macierz(i, i+2) = 1;
     end
 
-    alpha = abs(oblicz_pochodna_lewa(a));
-    beta = abs(oblicz_pochodna_lewa(b));
-
-    % alpha = abs(oblicz_pochodna(a));
-    % beta = abs(oblicz_pochodna(b));
+    alpha = abs(pochodna_a);
+    beta = abs(pochodna_b);
 
     rownanie_pierwszej_pochodnej = zeros(1,length(macierz));
     rownanie_pierwszej_pochodnej(1) = 4;
@@ -48,7 +15,6 @@ function wspolczynniki = splajny_proste()
     rownanie_drugiej_pochodnej = zeros(1,length(macierz));
     rownanie_drugiej_pochodnej(end - 1) = 2;
     rownanie_drugiej_pochodnej(end) = 4;
-
 
     macierz_z_pochodnymi = [
         rownanie_pierwszej_pochodnej
@@ -70,23 +36,7 @@ function wspolczynniki = splajny_proste()
         wspolczynniki
         wspolczynniki(end - 1) + (h/3) *beta];
 
-        wspolczynniki
-        h
-    test_y = [];
-    test_x = -1499:0.1:1999;
-    % test_x = 0:0.001:5;
-
-    for j = 1:length(test_x)
-        test_y(j) = oblicz_w_przedziale(rownoodlegle_x, wspolczynniki,  test_x(j), h);
-    end
-
-    % function y = oblicz(x)
-    %     y = x + cos(2 * x);
-    % end
-    % function y = oblicz_pochodna(x)
-    %     krok = 0.0000001;
-    %     y = (oblicz(x - krok) - oblicz(x)) / krok;
-    % end
+    wartosc = oblicz_w_przedziale(rownoodlegle_x, wspolczynniki, x_arg, h);
 
     function suma = oblicz_w_przedziale(x_wejsciowe, wspolczynniki, x, h)
         suma = 0;
@@ -120,13 +70,5 @@ function wspolczynniki = splajny_proste()
         for i = 1:length(wspolczynniki)
             suma = suma + (wspolczynniki(i) * wartosci_sklejane(i))* 1/(h^3);
         end
-    end
-
-    plot(test_x, test_y, 'g');
-    hold off;
-
-    function y = oblicz_pochodna_lewa(x) 
-        krok = 0.0000001;
-        y = (obliczanie_wielomianu(X, kwadraty_wspolczynniki, x - krok) - obliczanie_wielomianu(X, kwadraty_wspolczynniki, x)) / krok;
     end
 end

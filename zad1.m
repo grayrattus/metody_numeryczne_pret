@@ -226,10 +226,10 @@ function zad1()
         di = -1500:0.1:2000;
         dl = [];
 
-        a=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,5);
+        wsp=aproksymacja_najmniejszych_kwadratow(deltaT, hMatrix,5);
 
         for i=1:length(di)
-            dl(i) = obliczanie_wielomianu(deltaT, a, di(i));
+            dl(i) = obliczanie_wielomianu(deltaT, wsp, di(i));
         end
 
         fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu);
@@ -246,14 +246,50 @@ function zad1()
         end
         plot(di, dl, 'g');
 
+        n = 10;
+        a = -1500;
+        b = 2000;
+        h = (b - a) / n;
+
+        rownoodlegle_x = [];
+        rownoodlegle_y = [];
+        for i = 1:(n+1)
+            rownoodlegle_x(i) = a + (i - 1) * h;
+            rownoodlegle_y(i) = obliczanie_wielomianu(deltaT, wsp, rownoodlegle_x(i));
+        end
+
+        di = -1499:0.1:1999;
+        dl = [];
+        for i=1:length(di)
+            dl(i) = splajny_proste(rownoodlegle_x, rownoodlegle_y, oblicz_pochodna(a), oblicz_pochodna(b), di(i), n, h);
+        end
+
+        plot(di, dl);
+
+        function y = oblicz_pochodna(x) 
+            krok = 0.0000001;
+            y = (obliczanie_wielomianu(deltaT, a, x - krok) - obliczanie_wielomianu(deltaT, a, x)) / krok;
+        end
+
         title(sprintf('Wykres dla współczynnika przewodnictwa cieplnego'));
         xlabel('$\Delta T[^\circ C]$','interpreter', 'latex');
         ylabel('$h[W*m^{-2}]$','interpreter', 'latex');
-        legend('Charakterystyka pomiarowa', 'Aproksymacja najmniejszych kwadratów', 'Interpolacja funkcjami sklejanymi 3 stopnia', 'Interpolacja funkcjami 1 stopnia');
+        legend('Charakterystyka pomiarowa', 'Aproksymacja najmniejszych kwadratów', 'Interpolacja funkcjami sklejanymi 3 stopnia', 'Interpolacja funkcjami 1 stopnia', 'Interpolacja funkcjami 3 stopnia dla równoodległych punktów');
         saveas(fig,sprintf('Charakterystyka_ruchomego_h.png'));
+        close;
+        
+        fig=figure('Renderer', 'painters', 'Position', wielkosc_wykresu);
+        hold on;
+        title(sprintf('Wykres funkcji sklejanych 3 stopnia z rownoodleglymi argumentami'));
+        plot(di, dl);
+        plot(rownoodlegle_x, rownoodlegle_y, 'o');
+        xlabel('$\Delta T[^\circ C]$','interpreter', 'latex');
+        ylabel('$h[W*m^{-2}]$','interpreter', 'latex');
+        legend('Interpolacja funkcjami 3 stopnia dla równoodległych punktów', 'Równoodległe punkty');
+        saveas(fig,sprintf('Rownoodlegle.png'));
 
         hold off;
-        close;
+        %close;
     end
 
     function wykresy_dla_tabeli(krok)

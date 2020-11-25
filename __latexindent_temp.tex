@@ -108,7 +108,7 @@ Równania stanu
     \frac{m_w c_w}{hA} \frac{dT_w}{dt} + T_w = T_b  \nonumber
 \end{align}
 
-należy przekształcić do formy umożliwiającej obliczenie równań różniczkowych
+należy przekształcić do formy umożliwiającej obliczenie pochodnych po czasie
 
 \begin{equation}
      \begin{cases}
@@ -134,13 +134,25 @@ możemy przekształcić przez przemnożenie przez $\Delta t$
     \Delta y = \Delta t * f(t_i, y_i)
 \end{equation}
 
+Ponieważ szukamy wzoru na $y_{n+1}$ zatem do wzoru
+
+\begin{equation}
+    y_{n+1} = y_n + \Delta y
+\end{equation}
+
+Podstawiamy
+
+\begin{equation}
+    y_{i+1} = y_i + \Delta t * f(t_i, y_i)
+\end{equation}
+
 Co pozwala nam na przybliżanie wartości pochodnej numerycznie.
 
 \lstinputlisting[language=Octave, caption=Funkcja Eulera]{eulerr.m}
 
 \subsection{Ulepszona metoda Eulera}
 
-Różni się od podstowej tym, że iteracje odbywają się wzdłóż prostej o współczynniku
+Różni się od podstowej tym, że iteracje odbywają się wzdłóż prostej o współczynniku
 kierunkowym równym współczynnikowi stycznej do krzywej w punkcie oddalonym od 
 $x_0$ o $\frac{h}{2}$.
 
@@ -160,7 +172,7 @@ Postać ogólna wielomianu interpolacyjnego wygląda następująco:
     y = \alpha + \beta * x
 \end{equation}
 
-A współczynniki $\alpha$ oraz $\beta$ uzyskuje się przez rozwiazanie układu równań:
+A współczynniki $\alpha$ oraz $\beta$ uzyskuje się przez rozwiazanie układu równań:
 
 $$
 \left( \begin{array}{cc}
@@ -181,7 +193,7 @@ $$
 
 Interpolacja funkcjami sklejanymi 3 stopnia (Cubic spines interpolation)
 
-Interpolacja ta odbywa się poprzez stworzenie funkcji wielomianów trzeciego stopnia $ p_k(x) $
+Interpolacja ta odbywa się poprzez stworzenie funkcji wielomianów trzeciego stopnia $ p_k(x) $
 dla różnych interwałów $ [[x^k, x^{k+1}] $.
 
 $$
@@ -234,11 +246,11 @@ Zanim zaprogramowałem ten układ postawnowiłem rozwiązać sprawdzić jak taki
 
 Wybrane przeze mnie punkty to $(x_k, y_k)  = (1,1), (2,5), (3,4), (4, 9) $
 
-Najpierw określam ile powinno być wielomianów w układzie równań 
+Najpierw określam ile powinno być wielomianów w układzie równań 
 \begin{equation}
 n=(2*(N-2)+2)/2 = (2*(4-2)+2)/2 = 3 
 \end{equation}
-Możemy więc wyróżnić trzy wielomiany:
+Możemy więc wyróżnić trzy wielomiany:
 
 \begin{equation}
     p_1(x) = \delta _1 x^3 + \gamma _1 x^2 + \beta _1 x + \alpha _1
@@ -393,71 +405,6 @@ Metoda pozwala na numeryczne przybliżenie całki za pomocą zastąpienia przedz
 
 \lstinputlisting[language=Octave, caption=Funkcja obliczająca wartość całki metodą parabol]{calkowanie_numeryczne_parabol.m}
 
-\subsection{Splajny 3 stopnia dla równoodległych punktów}
-
-Dla przedziały, który ma odległość $h = \frac{b - a}{n}$.
-
-Otrzymuje się węzły równoodległe $x_i = a + i * h$ gdzie $i = 0,1,...,n$
-
-Pomiędzy, którymi oblicza się wartości dla \textbf{funkcji bazowej}
-opisanej wzorem:
-
-\begin{equation}
-  \Phi_{i} (x) = \frac{1}{h^3} *
-    \begin{cases}
-      (x - x_{i-2})^3 & \text{dla $x \in <x_{i-2}, x_{i-1}> $}\\
-      (x - x_{i-2})^3 - 4(x-x_{i-1})^3 & \text{dla $x \in <x_{i-1}, x_{i}> $}\\
-      (x_{i+2} - x)^3 - 4(x_{i+1} - x)^3 & \text{dla $x \in <x_{i}, x_{i_{i+1}}> $}\\
-      (x_{i+2} - x)^3 & \text{dla $x \in <x_{i+1}, x_{i+2}> $}\\
-      0 & \text{dla $x \in R - <x_{i-2}, x_{i+2}> $}\\
-    \end{cases}       
-\end{equation}
-
-Za pomocą zbioru tych funkcji można określić \textbf{funkcję sklejaną 3-iego stopnia}
-
-\begin{equation}
-    S_3(x) = \sum_{i=-1}^{n+1} c_i \Phi_i (x)
-\end{equation}
-
-gdzie $c_i$ są to współczynniki, które będą dobierane tak aby splajn był
-funkcją interpolacyjną.
-
-Wyznaczenie tych współczynników odbywa się poprzez rozwiązanie macierzy $n + 1$
-równań liniowych  o następującej postaci
-
-
-$$
-\left( \begin{array}{cccccccc}
-    4c_0 & 2c_1 \\
-    c_0 & 4c_1 & c_2 \\
-     &  & 4c_2 && c_3 \\
-     &  & \cdots && \cdots \\
-     &  &  & & & c_{n-2} & 4c_{n-1} & c_n \\
-     &  &  & & & & 2c_{n-1} & 4c_n \\
-\end{array} \right) = \left( \begin{array}{c}
-    y_0 + \frac{h}{3} * \alpha \\
-    y_1 \\
-    y_2 \\
-    \cdots \\
-    y_{n-1} \\
-    y_n - \frac{h}{3} * \beta \\
-\end{array} \right) 
-$$
-
-gdzie $S_3'(a^+) = \alpha $ oraz $S_3'(b^-) = \beta$
-
-przy czym ten układ pozwala tylko na rozwiązanie współczynników $c_0, c_1,...,c_n$
-dlatego pozostałe współczynniki oblicza się z wzorów
-
-\begin{equation}
-    c_{-1} = c_1  - \frac{h}{3} * \alpha \\
-\end{equation}
-\begin{equation}
-    c_{n+1} = c_{n-1}  - \frac{h}{3} * \beta 
-\end{equation}
-
-\lstinputlisting[language=Octave, caption=Funkcja obliczająca splajny 3 stopnia dla równoodległych punktów]{splajny_proste.m}
-
 \subsection{Metoda Newtona-Raphsona}
 
 Metoda ta pozwala na numeryczne przybliżenie pierwiastka równania dowolnej ciągłej funkcji $f$.
@@ -541,12 +488,12 @@ do błędów względnych, które obliczone zostały w poprzedniej tabeli ~\ref{t
 Zacznę więc od porównania błędów obu metod do wartości temperatur z eksperymentu.
 
 Dla dowolnego eksperymentu wartości blędów $eEUTw, eEUTb$ są mniejsze od $eETb, eETw$ z czego można wysnuć wniosek,
-że \textbf{Ulepszona metoda Eulera lepiej przybliża rozwiązania równań różniczkowych niż metoda Eulera}.
+że \textbf{Ulepszona metoda Eulera lepiej przybliża wartości pochodnej niż metoda Eulera}.
 
 Drugim elementem, na który zwróciłem uwagę jest różne zachowanie obu metod dla mniejszych wartości $\Delta t$.
-Metoda Eulera mniej dokładnie przybliża rozwiązania gdy krok ich obliczania jest większy. Można to 
+Metoda Eulera mniej dokładnie przybliża pochodną gdy krok obliczania tej pochodnej jest większy. Można to 
 zaobserwować na wykresach ~\ref{fig:wykresEulerMalyKrok} oraz ~\ref{fig:wykresEulerDuzyKrok}.
-Na wykresie z małym krokiem obie metody dobrze radzą sobie z przybliżaniem wartości jednak gdy
+Na wykresie z małym krokiem obie metody dobrze radzą sobie z przybliżaniem wartości pochodnej jednak gdy
 krok zostaje zwiększony wykres metody Eulera nie pokrywa się już z wykresem ulepszonej metody Eulera przy czym
 wykres ulepszonej metody pozostaje bez zmian.
 
@@ -600,13 +547,6 @@ Z czego można wysnuć wniosek, że \textbf{Wyższy stopień wielomianu nie koni
     \label{fig:interpolacjaAproksymacja}
 \end{figure}
 
-\begin{figure}[H]
-    \centering\includegraphics[width=0.6\textwidth]{Rownoodlegle.png} 
-    \caption{Interpolacja dla równoodległych punktów, które najpierw aproksymowane są
-    metodą najmniejszych kwadratów}
-    \label{fig:interpolacjaRowne}
-\end{figure}
-
 Z wykresu ~\ref{fig:interpolacjaAproksymacja} wynika, że funkcje sklejane zdecydowanie lepiej radzą sobie w przybliżeniu charakterystyki
 współczynnika $h$. O ile \textbf{funkcje sklejane 1 stopnia} przybliżają charakterystykę poprzez funkcje
 liniowe, które tworzą proste pomiędzy punktami to \textbf{funkcje sklejane 3 stopnia} tworzą idealnie
@@ -623,14 +563,6 @@ Można by taki wniosek wysnuć gdyby ilość punktów pomiarowych była większ
 trzebaby obliczyć błędy pomiędzy wartością funkcji a każdym z pomiarów. Przede wszystkim zbiór danych, na których
 wykonywane są metody interpolacji i aproksymacji jest bardzo ograniczony i oprócz gęstszego rozkładu w punkcie
 $0 [^\circ C] dla \Delta T$ dla pozostałej charakterystyki zmian $h$ punkty pomiarowe umieszczone są bardzo rzadko.
-
-Funkcje sklejane 3 stopnia z algorytmem dla obliczeń punktów równoodległych ~\ref{interpolacjaRowne} są najgorszą metodą
-jaką można zastosować do przybliżenia wartości współczynnika $h$.
-Przede wszystkim obecny w zadaniu zbiór danych nie pozwala na użycie tej metody
-bez uprzedniego wygenerowania równoodległych punktów za pomocą interpolacji lub aproksymacji.
-
-Lepiej jest już użyć ogólnego wzoru na funkcje sklejane, który jest bardziej skomplikowany
-ale lepiej przybliża wartość funkcji bez potrzeby generowania równoodległych punktów.
 
 \subsection{Całka metodą Simpsona}
 
@@ -653,8 +585,6 @@ Określenie całki pomiędzy tymi funkcjami nie doprowadziło mnie do żadnego w
 \includegraphics[width=0.4\textwidth]{modele_aproksymujace_7.png}\hspace{0.1\textwidth}%
 \includegraphics[width=0.4\textwidth]{modele_aproksymujace_8.png}\par
 
-\subsection{Podsumowanie}
-
 Przedstawione w tej sekcji wykresy pokazują, że współczynnik $h$ nie ma dużego wpływu na 
 wyniki symulacji rozkładu temperatury. W większości wykresów niezależnie od wartości współczynnika $h$
 temperatury oleju oraz prętów pokrywają się.
@@ -663,6 +593,13 @@ Co prowadzi do wniosku \textbf{Współczynnik $h$ ma nieznaczny wpływ na charak
 oraz \textbf{Wybranie metody do przybliżenia $h$ nie ma znaczenia dla przebiegów charakterystyki rozkładu temperatury}
 przez co do pozostałych zadań można wybrać dowolną funkcję przybliżającą współczynnik $h$.
 W moim przypadku wybrałem aproksymacje wielomianami.
+
+\subsection{Podsumowanie}
+
+Ostateczny koszt: 
+Dla ilość prętów
+Ilośc zbiorników
+Masa wody
 
 \section{Część 3}
 
@@ -675,9 +612,11 @@ Cele zadania trzeciego:
 
 \includegraphics[width=\textwidth]{NewtonRaphson.png} 
 
+Rozwiązanie części 3 nie doprowadziło mnie do żadnych wniosków.
+
 \subsection{Podsumowanie}
 
-Rozwiązanie części 3 nie doprowadziło mnie do żadnych wniosków.
+
 
 \section{Część 4}
 
@@ -697,11 +636,10 @@ prętów jest mniejszy od \textbf{100 PLN}. Wartość ta może zostać zmodyfik
 zmniejszenia czasu wykonywania się poszczególnych obliczeń dla 24 godzin uznałem, że jest
 ona wystarczająca jednak nie potrafię określić w jaki sposób dobrać ją bardziej metodologicznie.
 
-\begin{table}[H]
-    \centering\csvautobooktabular{wspolczynniki_symulacji.csv}
-    \caption{Współczynniki użyte podczas symulacji}
-\end{table}
-
+Program podzielony jest na następujące pliki:
+\lstinputlisting[language=Octave, caption=Częśc symulacyjna zawierająca zmienne globalne współczynników i generująca wykresy.]{symulator.m}
+\lstinputlisting[language=Octave, caption=Klasa przechowująca stan zbiorników oraz stany prętów.]{Zbiorniki.m}
+\lstinputlisting[language=Octave, caption=Klasa określająca stan w jakim znajduje się pojedynczy zbiornik.]{Zbiornik.m}
 
 \subsection{Wyniki}
 
@@ -745,17 +683,12 @@ Interesującym momentem jest bisekcja pomiędzy $1$ a $2$ gdzie jest ona taka sa
 gdy ilość zbiorników nie pozwala na schłodzenie 100 000 zbiorników zmienia ich ilość a samą masę
 zostawia ponieważ masa z poprzedniej bisekcji również nie pozwoliła na schłodzenie dostatecznej
 ilości prętów.
-\newpage
 
-\afterpage{\clearpage}
-
-\begin{wrapfigure}{l}{0.5\textwidth}
   \begin{center}
     \includegraphics[width=0.48\textwidth]{PretyNaDobe.png}
     \label{fig:minPretyNaDobe}
+    \caption{Ilość prętów na dobę}
   \end{center}
-  \caption{Ilość prętów na dobę}
-\end{wrapfigure}
 
 Wykres ~\ref{fig:minPretyNaDobe} wskazuje jak zmieniała się ilość prętów dla poszczególnych bisekcji.
 Duże zmiany w ilości prętów są spowodowane zmianą ilości zbiorników. Jak widać po $2$ bisekcji 
@@ -789,41 +722,7 @@ Każde napełnienie dodawane jest do sumarycznego kosztu.
 
 \afterpage{\clearpage}
 
-\begin{table}[H]
-    \hspace{-40pt}
-    \centering\csvautobooktabular{symulator.csv}
-    \caption{Wartości symulacji dla bisekcji}
-\end{table}
-
 \subsection{Podsumowanie}
-
-Wykorzystane przeze mnie rozwiązanie jest dalekie od ideału. Gdybym miał większą wiedzę z zakresu
-matematyki na pewno użyłbym innej techniki, która pozwoliłaby minimalizować większą ilość zmiennych
-jednocześnie. Wykorzystana przeze mnie metoda bisekcji pozwala na znalezienie rozwiązania jednak
-nie jest ona dobrym wyborem do minimalizacji kosztu dla dwóch zmiennych \textbf{masy oleju} oraz
-\textbf{ilości prętów}.
-
-Podsumowując najmniejszy koszt wyprodukowania 100 000 prętów można otrzymać przy $8$ równocześnie
-pracujących zbiornikach, które mają masę wody $0.1543$ i napełnieniu tych zbiorników $56$ razy.
-
-\section{Wnioski}
-
-\begin{itemize}
-    \item \textbf{Wykorzystanie metod Eulera do symulacji zjawiska chłodzenia pręta w oleju pozwala na stworzenie symulacji, która dostatecznie przybliża eksperymenty pomiarowe}
-    \item \textbf{Ulepszona metoda Eulera lepiej przybliża rozwiązania równań różniczkowych niż metoda Eulera}
-    \item \textbf{Ulepszona metoda Eulera bardziej nadaje się do symulowania zjawiska chłodzenia pręta w oleju niż metoda Eulera}.
-    \item \textbf{Wyższy stopień wielomianu nie koniecznie oznacza lepsze przybliżenie funkcji}
-    \item \textbf{Interpolacja funkcjami sklejanymi lepiej przbliża funkcję zmian współczynnika cieplnego}
-    \item \textbf{Współczynnik $h$ ma nieznaczny wpływ na charakterystykę rozkładu temperatury}
-    \item \textbf{Wybranie metody do przybliżenia $h$ nie ma znaczenia dla przebiegów charakterystyki rozkładu temperatury}
-\end{itemize}
-
-\section{Kod zadania 4}
-Program podzielony jest na następujące pliki:
-
-\lstinputlisting[language=Octave, caption=Częśc symulacyjna zawierająca zmienne globalne współczynników i generująca wykresy.]{symulator.m}
-\lstinputlisting[language=Octave, caption=Klasa przechowująca stan zbiorników oraz stany prętów.]{Zbiorniki.m}
-\lstinputlisting[language=Octave, caption=Klasa określająca stan w jakim znajduje się pojedynczy zbiornik.]{Zbiornik.m}
 
 \section{Kod zadań 1-3}
 \lstinputlisting[language=Octave, caption=Program generujący wykresy i tabele do zadań 1-3]{zad1.m}
