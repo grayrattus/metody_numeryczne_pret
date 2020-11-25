@@ -393,7 +393,7 @@ Metoda pozwala na numeryczne przybliżenie całki za pomocą zastąpienia przedz
 
 \lstinputlisting[language=Octave, caption=Funkcja obliczająca wartość całki metodą parabol]{calkowanie_numeryczne_parabol.m}
 
-\subsection{Splajny 3 stopnia dla równoodległych punktów}
+\subsection{Splajny równoodległych punktów}
 
 Dla przedziały, który ma odległość $h = \frac{b - a}{n}$.
 
@@ -624,7 +624,7 @@ trzebaby obliczyć błędy pomiędzy wartością funkcji a każdym z pomiarów.
 wykonywane są metody interpolacji i aproksymacji jest bardzo ograniczony i oprócz gęstszego rozkładu w punkcie
 $0 [^\circ C] dla \Delta T$ dla pozostałej charakterystyki zmian $h$ punkty pomiarowe umieszczone są bardzo rzadko.
 
-Funkcje sklejane 3 stopnia z algorytmem dla obliczeń punktów równoodległych ~\ref{interpolacjaRowne} są najgorszą metodą
+Funkcje sklejane 3 stopnia z algorytmem dla obliczeń punktów równoodległych ~\ref{fig:interpolacjaRowne} są najgorszą metodą
 jaką można zastosować do przybliżenia wartości współczynnika $h$.
 Przede wszystkim obecny w zadaniu zbiór danych nie pozwala na użycie tej metody
 bez uprzedniego wygenerowania równoodległych punktów za pomocą interpolacji lub aproksymacji.
@@ -662,7 +662,7 @@ temperatury oleju oraz prętów pokrywają się.
 Co prowadzi do wniosku \textbf{Współczynnik $h$ ma nieznaczny wpływ na charakterystykę rozkładu temperatury}
 oraz \textbf{Wybranie metody do przybliżenia $h$ nie ma znaczenia dla przebiegów charakterystyki rozkładu temperatury}
 przez co do pozostałych zadań można wybrać dowolną funkcję przybliżającą współczynnik $h$.
-W moim przypadku wybrałem aproksymacje wielomianami.
+W moim przypadku wybrałem metodę aproksymacji.
 
 \section{Część 3}
 
@@ -711,16 +711,16 @@ Na poniższych wykresach znajduje się stan symulacji dla numeru bisekcji.
   \vspace{-20pt}
   \begin{center}
     \includegraphics[width=0.48\textwidth]{Bisekcja.png}
-    \label{fig:minKoszt}
   \end{center}
   \vspace{-20pt}
   \caption{Koszt chłodzenia prętów}
   \vspace{30pt}
+  \label{fig:minKoszt}
 \end{wrapfigure}
 
-Wykres ~\ref{fig:minKoszt} prezentuje koszt dla poszczególnych bisekcji. Wykres oprócz bisekcji $2$
+Wykres \ref{fig:minKoszt} prezentuje koszt dla poszczególnych bisekcji. Wykres oprócz bisekcji $2$
 zmierza do minimum kosztu. Skok pomiędzy bisekcjami $1$ oraz $2$ spowodowany jest tym, że dla zmiany
-ilości zbiorników widocznej na wykresie ~\ref{fig:minIloscZbiornikow} nie udało się uzyskać liczby
+ilości zbiorników widocznej na wykresie \ref{fig:minIloscZbiornikow} nie udało się uzyskać liczby
 100 000 prętów dla zadanej konfiguracji $6$ zbiorników. W sytuacji gdy symulator nie jest w stanie
 dla danej ilości zbiorników schłodzić zadanej ilości prętów to ilość zbiorników jest ona zwiększana o $1$ i cały
 proces jest powtarzany. 
@@ -733,11 +733,11 @@ dla ilości zbiorników wyglądają następująco $a = 6$ oraz $b = 8$ z czego $
   \vspace{-20pt}
   \begin{center}
     \includegraphics[width=0.48\textwidth]{MasaOleju.png}
-    \label{fig:minMasaOleju}
   \end{center}
   \vspace{-20pt}
   \caption{Masa oleju}
   \vspace{30pt}
+  \label{fig:minMasaOleju}
 \end{wrapfigure}
 
 Wykres ~\ref{fig:minMasaOleju} obrazuje minimalizacje ilości oleju pomiędzy każdą bisekcją.
@@ -752,14 +752,14 @@ ilości prętów.
 \begin{wrapfigure}{l}{0.5\textwidth}
   \begin{center}
     \includegraphics[width=0.48\textwidth]{PretyNaDobe.png}
-    \label{fig:minPretyNaDobe}
   \end{center}
   \caption{Ilość prętów na dobę}
+  \label{fig:minPretyNaDobe}
 \end{wrapfigure}
 
 Wykres ~\ref{fig:minPretyNaDobe} wskazuje jak zmieniała się ilość prętów dla poszczególnych bisekcji.
 Duże zmiany w ilości prętów są spowodowane zmianą ilości zbiorników. Jak widać po $2$ bisekcji 
-ilość schłodzonych w 24 powoli spada i jest to spowodowane tym, że symulator minimalizuje koszt
+ilość prętów schłodzonych w 24h powoli spada i jest to spowodowane tym, że symulator minimalizuje koszt
 jedynie przez zmianę masy oleju. 
 
 \begin{figure}
